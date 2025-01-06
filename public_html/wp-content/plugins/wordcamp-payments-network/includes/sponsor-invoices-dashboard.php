@@ -403,7 +403,7 @@ function notify_organizer_status_changed( $invoice_id, $new_status ) {
 
 	wp_mail( $to, $subject, $message, $headers, $attachments );
 
-	if ( $invoice_filename ) {
+	if ( $invoice_filename && ! is_wp_error( $invoice_filename ) ) {
 		unlink( $invoice_filename );
 	}
 }
