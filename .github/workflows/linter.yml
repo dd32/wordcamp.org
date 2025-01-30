@@ -31,6 +31,10 @@ jobs:
       with:
         node-version: 16.x
 
+    - name: Install SVN
+      run: |
+        sudo apt-get update && sudo apt-get install -y subversion
+
     - name: composer install
       run: |
         composer install
