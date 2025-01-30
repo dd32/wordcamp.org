@@ -824,8 +824,6 @@ class WordCamp_Central_Theme {
 				}
 			}
 
-			// @todo generate countries automatically from _venue_country_code field, but need to populate older camps first.
-
 			// Compile the results.
 			$map_stats = array(
 				'wordcamps'  => $wordcamps->found_posts,
