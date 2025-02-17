@@ -70,7 +70,7 @@ class WordCamp_Docs_Template_Sponsorship_Agreement implements WordCamp_Docs_Temp
 		$sponsorship_amount = $number_formatter->format( (float) $sponsor_amount ) . " {$sponsor_currency}";
 
 		$number_formatter       = new NumberFormatter( get_locale(), NumberFormatter::CURRENCY );
-		$sponsorship_amount_num = $number_formatter->formatCurrency( $sponsor_amount, $sponsor_currency );
+		$sponsorship_amount_num = $number_formatter->formatCurrency( (float) $sponsor_amount, $sponsor_currency );
 
 		$data = wp_parse_args( $data, array( // phpcs:ignore PEAR.Functions.FunctionCallSignature.MultipleArguments
 			'sponsor_name'            => get_the_title( $sponsor_id ),
