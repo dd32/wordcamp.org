@@ -6115,6 +6115,8 @@ class CampTix_Plugin {
 				),
 			),
 			'cache_results' => false,
+			'orderby' => 'ID',
+			'order' => 'ASC',
 		) );
 
 		if ( ! $attendees ) {
@@ -6153,6 +6155,8 @@ class CampTix_Plugin {
 					),
 				),
 				'cache_results' => false,
+				'orderby' => 'ID',
+				'order' => 'ASC',
 			) ) ) :
 
 				$attendee_ids = array();
@@ -7823,6 +7827,9 @@ class CampTix_Plugin {
 					'type' => 'CHAR',
 				),
 			),
+			// Ensure that the buyer is always first in the list.
+			'orderby' => 'ID',
+			'order'   => 'ASC',
 		) );
 
 		if ( ! $attendees )
@@ -7849,11 +7856,13 @@ class CampTix_Plugin {
 		// Set the tmp receipt for shortcodes use.
 		$this->tmp( 'receipt', $receipt_content );
 
+		// Find the buyers name.
 		foreach ( $attendees as $attendee ) {
 			$attendee_email = $this->get_attendee_email( $attendee->ID );
 
 			if ( $attendee_email == $receipt_email ) {
 				$this->tmp( 'buyer_full_name', get_post_meta( $attendee->ID, 'tix_first_name', true ) . ' ' . get_post_meta( $attendee->ID, 'tix_last_name', true ) );
+				break;
 			}
 		}
 
