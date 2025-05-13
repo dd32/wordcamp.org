@@ -43,7 +43,7 @@
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
-<li><a href="https://events.wordpress.org/campusconnect/">WordPress Campus Connect</a>↗</li>
+<li><a href="https://events.wordpress.org/campusconnect/">WordPress Campus Connect↗</a></li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
