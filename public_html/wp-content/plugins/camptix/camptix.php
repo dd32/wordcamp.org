@@ -1540,7 +1540,7 @@ class CampTix_Plugin {
 			) ) ) {
 				foreach ( $attendees as $attendee ) {
 					$new_answers = array();
-					$answers     = $camtix->get_attendee_answers( $attendee->ID );
+					$answers     = $this->get_attendee_answers( $attendee->ID );
 
 					// Just in case the upgrade script runs more than once
 					$answers_backup = (array) get_post_meta( $attendee->ID, 'tix_questions_backup', true );
