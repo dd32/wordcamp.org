@@ -944,20 +944,19 @@ class CampTix_Plugin {
 	 * @return array
 	 */
 	function get_sorted_questions( $ticket_id ) {
+		$questions    = array();
 		$question_ids = (array) get_post_meta( $ticket_id, 'tix_question_id' );
-		$order = (array) get_post_meta( $ticket_id, 'tix_questions_order', true );
+		$order        = (array) get_post_meta( $ticket_id, 'tix_questions_order', true );
 
-		// Make sure we have at least some questions
-		if ( empty( $question_ids ) ) {
-			return array();
+		// They might not have any custom ticket questions.
+		if ( $question_ids ) {
+			$questions = get_posts( array(
+				'post_type' => 'tix_question',
+				'post_status' => 'publish',
+				'posts_per_page' => -1,
+				'post__in' => $question_ids,
+			) );
 		}
-
-		$questions = get_posts( array(
-			'post_type' => 'tix_question',
-			'post_status' => 'publish',
-			'posts_per_page' => -1,
-			'post__in' => $question_ids,
-		) );
 
 		/**
 		 * Filter the questions for a ticket.
