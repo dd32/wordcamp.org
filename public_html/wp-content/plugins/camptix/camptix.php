@@ -2903,7 +2903,7 @@ class CampTix_Plugin {
 					'payment_method' => $this->get_payment_method_name_by_attendee_id( $attendee_id ),
 				);
 
-				$answers = $camptix->get_attendee_answers( $attendee_id );
+				$answers = $this->get_attendee_answers( $attendee_id );
 
 				foreach ( $questions as $question ) {
 
