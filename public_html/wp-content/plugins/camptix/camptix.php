@@ -4382,11 +4382,11 @@ class CampTix_Plugin {
 		$a11y_label     = $question->a11y_label ?? strip_tags( apply_filters( 'the_title', $question->post_title ) );
 
 		/*
-  		 * HTML doesn't support setting the required attribute on a group of checkboxes.
-     		 * Rely upon serverside form validation instead if there are multiple.
+		 * HTML doesn't support setting the required attribute on a group of checkboxes.
+		 * Rely upon serverside form validation instead if there are multiple.
 		 *
 		 * @see https://www.w3.org/Bugs/Public/show_bug.cgi?id=9160#c1
-     		 */
+		 */
 		if ( $required && count( $values ) > 1 ) {
 			$required = false;
 		}
