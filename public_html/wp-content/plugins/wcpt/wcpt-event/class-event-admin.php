@@ -472,6 +472,12 @@ abstract class Event_Admin {
 			}
 		}
 
+		// Save the Event Subtype.
+		if ( isset( $_POST['event_subtype'] ) && current_user_can( $this->get_edit_capability() ) ) {
+			$event_subtype = sanitize_text_field( wp_unslash( $_POST['event_subtype'] ) );
+			update_post_meta( $post_id, 'event_subtype', $event_subtype );
+		}
+
 		$meta_keys        = $this->meta_keys();
 		$orig_meta_values = get_post_meta( $post_id );
 		$is_virtual_event = WordCamp_admin::is_virtual_event( $post_id );
@@ -967,5 +973,12 @@ abstract class Event_Admin {
 		endforeach;
 	}
 
-
+	/**
+	 * Returns the list of Event Subtypes.
+	 *
+	 * This is generally 'WordCamp', 'DoAction', 'Other Event', 'Campus Connect', etc.
+	 *
+	 * @return array
+	 */
+	abstract public function get_event_subtypes();
 }

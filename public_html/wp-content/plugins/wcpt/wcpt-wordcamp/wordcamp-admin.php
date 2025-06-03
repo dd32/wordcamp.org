@@ -413,6 +413,7 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 						'Event Timezone'                    => 'select-timezone',
 						'Location'                          => 'text',
 						'URL'                               => 'wc-url',
+						'Secondary Site'                    => 'wc-url', // Any "secondary" site for an event, ie. Second language site or a private team site.
 						'E-mail Address'                    => 'text', // The entire organizing team.
 						'Twitter'                           => 'text',
 						'WordCamp Hashtag'                  => 'text',
@@ -442,6 +443,7 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 						'Event Timezone'                    => 'select-timezone',
 						'Location'                          => 'text',
 						'URL'                               => 'wc-url',
+						'Secondary Site'                    => 'wc-url', // Any "secondary" site for an event, ie. Second language site or a private team site.
 						'E-mail Address'                    => 'text', // The entire organizing team.
 						'Twitter'                           => 'text',
 						'WordCamp Hashtag'                  => 'text',
@@ -1136,6 +1138,20 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 		 */
 		public static function get_edit_capability() {
 			return 'wordcamp_wrangle_wordcamps';
+		}
+
+		/**
+		 * Return a list of valid Event Subtypes.
+		 *
+		 * @return array
+		 */
+		public function get_event_subtypes() {
+			return array(
+				'wordcamp'      => __( 'WordCamp', 'wordcamporg' ),
+				'doaction'      => __( 'DoAction', 'wordcamporg' ),
+				'campusconnect' => __( 'Campus Connect', 'wordcamporg' ),
+				'other'         => __( 'Other Event', 'wordcamporg' ),
+			);
 		}
 
 		/**
