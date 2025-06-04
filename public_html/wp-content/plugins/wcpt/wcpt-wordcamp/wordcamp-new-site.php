@@ -180,7 +180,7 @@ class WordCamp_New_Site {
 			return;
 		}
 
-		$validate_url = static function ( $url ) {
+		$validate_url = static function ( $url ) use ( $wordcamp_id ) {
 			$url = str_starts_with( $url, 'http' ) ? $url : 'http://' . $url;
 			$url = set_url_scheme( esc_url_raw( $url ), 'https' );
 
