@@ -395,14 +395,19 @@ jQuery(document).ready(function($){
 		 * Main Application events/controls.
 		 */
 		events: {
-			'fastClick .dashicons-menu': 'menu',
-			'fastClick .submenu .search': 'searchView',
-			'fastClick header h1': 'searchView',
-			'fastClick .submenu .sort': 'sortView',
-			'fastClick .submenu .refresh': 'refresh',
-			'fastClick .submenu .filter': 'filterView'
+			'click .dashicons-menu': 'menu',
+			'click .submenu .search': 'searchView',
+			'click header h1': 'searchView',
+			'click .submenu .sort': 'sortView',
+			'click .submenu .refresh': 'refresh',
+			'click .submenu .qr': 'qr',
+			'click .submenu .filter': 'filterView',
+			'click #html5-qrcode-button-camera-permission': 'alert',
 		},
 
+		alert: function () {
+			alert('asd');
+		},
 		/**
 		 * Initialize the application.
 		 */
@@ -421,8 +426,9 @@ jQuery(document).ready(function($){
 
 			this.render();
 
-			this.$header = this.$el.find( 'header' );
-			this.$menu = this.$header.find( '.menu' );
+			this.$header = this.$el.find('header');
+			this.$qrscanner = this.$el.find('.qr-scanner');
+			this.$menu = this.$header.find('.menu');
 
 			this.scroll = _.chain( this.scroll ).bind( this ).value();
 			this.$list = this.$el.find( '.attendees-list' );
@@ -435,6 +441,13 @@ jQuery(document).ready(function($){
 			this.on( 'filter', this.filter, this );
 
 			this.setupCollection();
+
+			if (
+				_camptixAttendanceQRScanning !== undefined &&
+				_camptixAttendanceQRScanning
+			) {
+			}
+			this.qr();
 		},
 
 		/**
@@ -571,6 +584,76 @@ jQuery(document).ready(function($){
 			delete this.collection;
 			this.flush();
 			this.setupCollection();
+			return false;
+		},
+
+		qr: function () {
+			this.$el.toggleClass('qr-scanner-active');
+			this.$menu.removeClass('dropdown');
+
+			var that = this;
+
+			let html5QrcodeScanner;
+			let lastScan;
+			let toggleView;
+
+			function onScanSuccess(decodedText, decodedResult) {
+				if (lastScan === decodedText) {
+					return;
+				}
+
+				lastScan = decodedText;
+
+				if (toggleView) toggleView.close();
+				let method = 'read';
+				let model = that.collection;
+				let options = {
+					data: { qrcode: decodedText },
+				};
+				let attendeeModel;
+
+				that.collection
+					.sync(method, model, options)
+					.done(
+						function (res) {
+							// not sure why this is an array
+							attendeeModel = new camptix.models.Attendee(res[0]);
+							toggleView = new camptix.views.AttendeeToggleView({
+								model: attendeeModel,
+								controller: that,
+							});
+							$(document.body).append(toggleView.render().el);
+						}.bind(that)
+					)
+					.fail(function (res) {
+						console.log('fail', res);
+					})
+					.always(() => {
+						setTimeout(() => {
+							//html5QrcodeScanner.resume();
+							that.refresh();
+						}, 3000);
+						html5QrcodeScanner.resume();
+					});
+
+				html5QrcodeScanner.pause();
+			}
+
+			let c = document.getElementById('qr-reader').getBoundingClientRect();
+
+			let qrbox = {
+				width: c.width * 0.7,
+				height: c.width * 0.7,
+			};
+			console.log(c, qrbox);
+
+			html5QrcodeScanner = new Html5QrcodeScanner(
+				'qr-reader',
+				{ fps: 1, qrbox: qrbox },
+				false
+			);
+			html5QrcodeScanner.render(onScanSuccess);
+
 			return false;
 		},
 

@@ -65,6 +65,8 @@ class CampTix_Attendance extends CampTix_Addon {
 		wp_enqueue_script( 'jquery-fastbutton', plugins_url( '/assets/jquery.fastbutton.js', __FILE__ ), array( 'jquery' ) );
 		wp_enqueue_script( 'camptix-attendance-ui', plugins_url( '/assets/attendance-ui.js' , __FILE__ ), array( 'backbone', 'jquery', 'wp-util', 'jquery-fastbutton' ) );
 		wp_enqueue_style( 'camptix-attendance-ui', plugins_url( '/assets/attendance-ui.css', __FILE__ ), array( 'dashicons' ) );
+		wp_enqueue_script( 'camptix-attendance-ui', plugins_url( '/assets/attendance-ui.js', __FILE__ ), array( 'backbone', 'jquery', 'wp-util', 'jquery-fastbutton', 'html5-qr-scanner' ), filemtime( __DIR__ . '/assets/attendance-ui.js' ) );
+		wp_enqueue_style( 'camptix-attendance-ui', plugins_url( '/assets/attendance-ui.css', __FILE__ ), array( 'dashicons' ), filemtime( __DIR__ . '/assets/attendance-ui.css' ) );
 
 		$camptix->tmp( 'attendance_tickets', $this->get_tickets() );
 		return dirname( __FILE__ ) . '/attendance-ui.php';
@@ -80,12 +82,49 @@ class CampTix_Attendance extends CampTix_Addon {
 		if ( empty( $_REQUEST['camptix_secret'] ) || $_REQUEST['camptix_secret'] != $this->secret )
 			return;
 
+		// get qr code response if requested
+		if ( isset( $_GET['qrcode'] ) ) {
+			return $this->_ajax_qrcode();
+		}
+
 		$action = $_REQUEST['camptix_action'];
 		if ( 'sync-model' == $action ) {
 			return $this->_ajax_sync_model();
 		} elseif ( 'sync-list' == $action ) {
 			return $this->_ajax_sync_list();
 		}
+	}
+
+	/**
+	 * Gets the attende object by the qrcode.
+	 */
+	public function _ajax_qrcode() {
+
+		$qrcode = sanitize_text_field( $_GET['qrcode'] );
+
+		if ( ! preg_match( '/^[0-9a-f]{16}$/', $qrcode ) ) {
+			//return wp_send_json_error( 'invalid qrcode format' );
+		}
+
+		global $wpdb;
+
+		// get the attende ID by the qrcode
+		// this is maybe resource intensive for larger events allthough we don't had any WordCamp > 3000 tickets so I guess we're fine
+		$attendee_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM `{$wpdb->prefix}postmeta` WHERE `meta_key` = 'tix_access_token' AND md5(meta_value) = %s", $qrcode ) );
+
+		if ( empty( $attendee_id ) ) {
+			return wp_send_json_error( 'user not found' );
+		}
+		// if ( ! $attendee || 'tix_attendee' != $attendee->post_type || 'publish' != $attendee->post_status ) {
+		//  return wp_send_json_error( 'user not found' );
+		// }
+
+		$attendee = get_post( $attendee_id );
+
+		if ( empty( $attendee ) ) {
+			return wp_send_json_error( 'user not found' );
+		}
+		return wp_send_json_success( array( $this->_make_object( $attendee ) ) );
 	}
 
 	/**
@@ -270,16 +309,38 @@ class CampTix_Attendance extends CampTix_Addon {
 				INNER JOIN $wpdb->postmeta tix_last_name ON ( ID = tix_last_name.post_id AND tix_last_name.meta_key = 'tix_last_name' )
 			";
 
-			$clauses['where'] .= $wpdb->prepare( "
-				AND (
+				$where = $wpdb->prepare(
+					"
+				(
 					tix_first_name.meta_value LIKE '%%%s%%' OR
 					tix_last_name.meta_value LIKE '%%%s%%' OR
 					CONCAT( tix_first_name.meta_value, ' ', tix_last_name.meta_value ) LIKE '%%%s%%'
 				)
-			", $search, $search, $search );
+			",
+					$search,
+					$search,
+					$search
+				);
 
-			return $clauses;
-		} );
+				// Match against the Access Token, specifically the second half of the hash, if it looks like one.
+				if ( preg_match( '!^[0-9a-f]{16}$!i', $search ) ) {
+					$clauses['join'] .= "
+					INNER JOIN $wpdb->postmeta tix_access_token ON ( ID = tix_access_token.post_id AND tix_access_token.meta_key = 'tix_access_token' )
+				";
+
+					$where = '(' .
+						$where .
+						' OR (' .
+						$wpdb->prepare( "tix_access_token.meta_value LIKE '%%%s'", $search ) .
+						')' .
+					')';
+				}
+
+				$clauses['where'] .= ' AND ' . $where;
+
+				return $clauses;
+			}
+		);
 	}
 
 	/**
@@ -335,6 +396,14 @@ class CampTix_Attendance extends CampTix_Addon {
 
 		// Fields
 		$camptix->add_settings_field_helper( 'attendance-enabled', esc_html__( 'Enabled', 'wordcamporg' ), 'field_yesno', 'general' );
+
+		$camptix->add_settings_field_helper(
+			'attendance-qr-enabled',
+			esc_html__( 'QR Code Scanning', 'wordcamporg' ),
+			'field_yesno',
+			'general',
+			esc_html__( 'Enable QR code scanning?', 'wordcamporg' )
+		);
 
 		add_settings_field( 'attendance-questions', esc_html__( 'Questions', 'wordcamporg' ), array( $this, 'field_questions' ), 'camptix_options', 'general', esc_html__( 'Show these additional ticket questions in the UI.', 'wordcamporg' ) );
 
@@ -407,6 +476,10 @@ class CampTix_Attendance extends CampTix_Addon {
 	public function validate_options( $output, $input ) {
 		if ( isset( $input['attendance-enabled'] ) )
 			$output['attendance-enabled'] = (bool) $input['attendance-enabled'];
+
+		if ( isset( $input['attendance-qr-enabled'] ) ) {
+			$output['attendance-qr-enabled'] = (bool) $input['attendance-qr-enabled'];
+		}
 
 		if ( ! empty( $input['attendance-generate'] ) ) {
 			$output['attendance-secret'] = wp_generate_password( 32, false, false );

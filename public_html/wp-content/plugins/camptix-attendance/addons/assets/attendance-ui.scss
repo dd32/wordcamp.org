@@ -221,6 +221,20 @@ li.item {
 	display: block;
 	margin-right: 50px;
 	margin-left: 50px;
+
+	.previews {
+		position: fixed;
+		bottom: 1em;
+		left: 1em;
+		right: 1em;
+
+		video {
+			max-height: 8em;
+			max-width: 8em;
+			width: 8em;
+			float: right;
+		}
+	}
 }
 
 .attendee-search-view input {
