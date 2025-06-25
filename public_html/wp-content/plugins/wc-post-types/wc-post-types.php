@@ -1763,14 +1763,15 @@ class WordCamp_Post_Types_Plugin {
 			'wcb_organizer_team',
 			'wcb_organizer',
 			array(
-				'labels'       => $labels,
-				'rewrite'      => array( 'slug' => 'team' ),
-				'query_var'    => 'team',
-				'hierarchical' => true,
-				'public'       => true,
-				'show_ui'      => true,
-				'show_in_rest' => true,
-				'rest_base'    => 'organizer_team',
+				'labels'            => $labels,
+				'rewrite'           => array( 'slug' => 'team' ),
+				'query_var'         => 'team',
+				'hierarchical'      => true,
+				'public'            => true,
+				'show_ui'           => true,
+				'show_in_rest'      => true,
+				'show_admin_column' => true,
+				'rest_base'         => 'organizer_team',
 			)
 		);
 
@@ -1792,13 +1793,14 @@ class WordCamp_Post_Types_Plugin {
 			'wcb_volunteer_team',
 			'wcb_volunteer',
 			array(
-				'labels'       => $labels,
-				'rewrite'      => array( 'slug' => 'team' ),
-				'query_var'    => 'team',
-				'hierarchical' => true,
-				'public'       => true,
-				'show_ui'      => true,
-				'show_in_rest' => true,
+				'labels'            => $labels,
+				'rewrite'           => array( 'slug' => 'volunteer_team' ),
+				'query_var'         => 'volunteer_team',
+				'hierarchical'      => true,
+				'public'            => true,
+				'show_ui'           => true,
+				'show_in_rest'      => true,
+				'show_admin_column' => true,
 			)
 		);
 
