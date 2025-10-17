@@ -6,10 +6,13 @@ on:
     paths:
     - public_html/**
     - .github/workflows/**
+    - phpunit.*
   push:
     branches: [production]
     paths:
     - public_html/**
+    - .github/workflows/**
+    - phpunit.*
 
 jobs:
   unit-js:
