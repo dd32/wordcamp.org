@@ -58,6 +58,8 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 			add_action( 'wcpt_close_wordcamps_after_event', array( $this, 'close_wordcamps_after_event' ) );
 			add_action( 'wcpt_metabox_save_done', array( $this, 'update_venue_address' ), 10, 2 );
 			add_action( 'wcpt_metabox_save_done', array( $this, 'update_mentor' ) );
+
+			add_action( 'parse_query', array( $this, 'sort_by_event_date' ) );
 		}
 
 		/**
@@ -631,9 +633,51 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 				'wcpt_organizer' => __( 'Organizer', 'wordcamporg' ),
 				'wcpt_mentor'    => __( 'Mentor', 'wordcamporg' ),
 				'wcpt_venue'     => __( 'Venue',     'wordcamporg' ),
+				'wcpt_tickets'   => __( 'Tickets',   'wordcamporg' ),
 				'date'           => __( 'Status',    'wordcamporg' ),
 			);
 			return $columns;
+		}
+
+		/**
+		 * Customize the sortable columns
+		 *
+		 * @param array $columns List of columns.
+		 * @return array $columns
+		 */
+		public function sortable_columns( $columns ) {
+			$columns['wcpt_date'] = 'wcpt_date';
+
+			return $columns;
+		}
+
+		/**
+		 * Customize the orderby behavior for sortable columns.
+		 *
+		 * @param WP_Query $query The current WP_Query instance.
+		 */
+		public function sort_by_event_date( $query ) {
+			$sortby = $_GET['orderby'] ?? '';
+			if (
+				! is_admin() ||
+				! $query->is_main_query() ||
+				WCPT_POST_TYPE_ID !== $query->get( 'post_type' )
+			) {
+				return;
+			}
+
+			if ( 'wcpt_date' === $sortby ) {
+				$sortby = array(
+					'key' => 'Start Date (YYYY-mm-dd)',
+					'compare' => 'DATE',
+				);
+				$meta_query = $query->get( 'meta_query' ) ?: [];
+
+				$meta_query['wcpt_date'] = $sortby;
+
+				$query->set( 'meta_query', $meta_query );
+				$query->set( 'orderby', 'wcpt_date' );
+			}
 		}
 
 		/**
@@ -655,11 +699,10 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 
 				case 'wcpt_date':
 					// Has a start date.
-					$start = wcpt_get_wordcamp_start_date();
+					$start = wcpt_get_wordcamp_start_date( $post_id, 'Y-m-d' );
 					if ( $start ) {
-
 						// Has an end date.
-						$end = wcpt_get_wordcamp_end_date();
+						$end = wcpt_get_wordcamp_end_date( $post_id, 'Y-m-d' );
 						if ( $end ) {
 							$string_date = sprintf( __( 'Start: %1$s<br />End: %2$s', 'wordcamporg' ), $start, $end );
 							// No end date.
@@ -694,6 +737,50 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 
 				case 'wcpt_venue':
 					echo esc_html( wcpt_get_wordcamp_venue_name() ? wcpt_get_wordcamp_venue_name() : __( 'No Venue', 'wordcamporg' ) );
+					break;
+
+				case 'wcpt_tickets':
+					// Fetch the Camptix Stats option from the WordCamp site, if it's created.
+					$site_id = get_wordcamp_site_id( get_post( $post_id ) );
+					if ( ! $site_id ) {
+						return;
+					}
+					$admin_url = get_admin_url( $site_id, 'edit.php?post_type=tix_ticket' );
+
+					$stats             = get_blog_option( $site_id, 'camptix_stats', array() );
+					$tickets_sold      = $stats['sold'] ?? 0;
+					$tickets_proposed  = absint( get_post_meta( $post_id, 'Number of Anticipated Attendees', true ) );
+					$tickets_capacity  = ( $tickets_sold + ( $stats['remaining'] ?? 0 ) ) ?: $tickets_proposed;
+
+					if ( ! $tickets_sold && ! $tickets_capacity && ! $tickets_proposed ) {
+						return;
+					}
+
+					printf(
+						/* translators: 1: number of tickets sold, 2: total ticket capacity */
+						'<a href="%s">%s</a>',
+						esc_url( $admin_url ),
+						esc_html(
+							sprintf(
+								/* translators: 1: number of tickets sold, 2: total ticket capacity */
+								_x( '%1$s of %2$s', 'Tickets sold of capacity', 'wordcamporg' ),
+								number_format_i18n( $tickets_sold ),
+								number_format_i18n( $tickets_capacity )
+							)
+						)
+					);
+					if ( $tickets_sold ) {
+						echo '<br>' . number_format_i18n( $tickets_sold / $tickets_capacity * 100 ) . '%';
+					}
+					if ( $tickets_proposed ) {
+						echo '<br>';
+						printf(
+							/* translators: %s is the number of expected tickets. */
+							esc_html_x( '%s expected', 'Tickets expected', 'wordcamporg' ),
+							number_format_i18n( $tickets_proposed )
+						);
+					}
+
 					break;
 			}
 		}

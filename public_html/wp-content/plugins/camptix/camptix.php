@@ -143,6 +143,7 @@ class CampTix_Plugin {
 		add_action( 'transition_post_status', array( $this, 'transition_post_status' ), 10, 3 );
 		add_action( 'wp_ajax_camptix_client_stats', array( $this, 'process_client_stats' ) );
 		add_action( 'wp_ajax_nopriv_camptix_client_stats', array( $this, 'process_client_stats' ) );
+		add_action( 'edit_post_tix_attendee', array( $this, 'cron_camptix_stats_ticket_validation' ) );
 
 		// Notices, errors and infos, all in one.
 		add_action( 'camptix_notices', array( $this, 'do_notices' ) );
@@ -189,6 +190,7 @@ class CampTix_Plugin {
 		add_action( 'tix_scheduled_every_ten_minutes', array( $this, 'process_refund_all' ) );
 
 		add_action( 'tix_scheduled_daily', array( $this, 'review_timeout_payments' ) );
+		add_action( 'tix_scheduled_daily', array( $this, 'cron_camptix_stats_ticket_validation' ) );
 
 		if ( ! wp_next_scheduled( 'tix_scheduled_every_ten_minutes' ) )
 			wp_schedule_event( time(), '10-mins', 'tix_scheduled_every_ten_minutes' );
@@ -644,6 +646,11 @@ class CampTix_Plugin {
 				} else {
 					// translators: 1: "from" date, 2: "to" date
 					printf( __( '%1$s &mdash; %2$s', 'wordcamporg' ), esc_html( $start ), esc_html( $end ) );
+				}
+
+				// If the tickets are not available, denote that on the tickets overview.
+				if ( ! $this->is_ticket_valid_for_purchase( $post_id ) ) {
+					echo '<br><em>' . esc_html__( 'Not available for purchase', 'wordcamporg' ) . '</em>';
 				}
 
 				break;
@@ -2406,9 +2413,9 @@ class CampTix_Plugin {
 
 	/**
 	 * Updates a stats value.
-  	 *
-    	 * @param $data array|string A Key => Value set of stats to update. Or if $value is passed, the string key.
-      	 * @param $value mixed Optional. If $data is a string key, this is the value. Ignored if Array is passed to $data.
+	 *
+	 * @param $data array|string A Key => Value set of stats to update. Or if $value is passed, the string key.
+	 * @param $value mixed Optional. If $data is a string key, this is the value. Ignored if Array is passed to $data.
 	 */
 	function update_stats( $data, $value = null ) {
 		// Back-compat for update_stats( $key, $value );
@@ -2416,13 +2423,15 @@ class CampTix_Plugin {
 			$data = array( $data => $value );
 		}
 
+		// Fetch directly from the database to avoid some race conditions.
+		wp_cache_delete( 'camptix_stats', 'options' );
 		$stats = get_option( 'camptix_stats', array() );
 
 		foreach ( $data as $key => $value ) {
 			$stats[ $key ] = $value;
 		}
 
-		update_option( 'camptix_stats', $stats );
+		update_option( 'camptix_stats', $stats, false /* do not autoload */ );
 	}
 
 	/**
@@ -2446,13 +2455,16 @@ class CampTix_Plugin {
 	 * Increments a stats value.
 	 */
 	function increment_stats( $key, $step = 1 ) {
+		// Fetch directly from the database to avoid some race conditions.
+		wp_cache_delete( 'camptix_stats', 'options' );
 		$stats = get_option( 'camptix_stats', array() );
-		if ( ! isset( $stats[ $key ] ) )
-			$stats[ $key ] = 0;
 
+		$stats[ $key ] ??= 0;
 		$stats[ $key ] += $step;
-		update_option( 'camptix_stats', $stats );
-		return;
+
+		update_option( 'camptix_stats', $stats, false /* do not autoload */ );
+
+		return $stats[ $key ];
 	}
 
 	/**
@@ -2460,10 +2472,8 @@ class CampTix_Plugin {
 	 */
 	function get_stats( $key ) {
 		$stats = get_option( 'camptix_stats', array() );
-		if ( isset( $stats[ $key ] ) )
-			return $stats[ $key ];
 
-		return 0;
+		return $stats[ $key ] ?? 0;
 	}
 
 	/**
@@ -2495,7 +2505,10 @@ class CampTix_Plugin {
 
 			if ( $multiplier != 0 ) {
 				$this->increment_stats( 'sold', 1 * $multiplier );
-				$this->increment_stats( 'remaining', -1 * $multiplier );
+				$new_value = $this->increment_stats( 'remaining', -1 * $multiplier );
+				if ( $new_value < 0 ) {
+					$this->update_stats( 'remaining', 0 );
+				}
 
 				$price = (float) get_post_meta( $post->ID, 'tix_ticket_price', true );
 				$discounted_price = (float) get_post_meta( $post->ID, 'tix_ticket_discounted_price', true );
@@ -2510,6 +2523,41 @@ class CampTix_Plugin {
 			}
 		}
 	}
+
+	/**
+	 * Daily cron to ensure that the camtix_stats data is correct.
+	 *
+	 * This is hooked onto both a daily cron, and the tix_ticket update hook.
+	 */
+	public function cron_camptix_stats_ticket_validation() {
+		if ( $this->is_wordcamp_closed() ) {
+			return;
+		}
+
+		// Recalculate number of sold tickets.
+		$sold_count = (int) wp_count_posts( 'tix_attendee' )->publish ?? 0;
+
+		// Recalculate the number of remaining tickets.
+		$remaining_count = 0;
+		$tickets = get_posts( array(
+			'post_type'      => 'tix_ticket',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+		) );
+
+		foreach ( $tickets as $ticket_id ) {
+			if ( $this->is_ticket_valid_for_purchase( $ticket_id ) ) {
+				$remaining_count += $this->get_remaining_tickets( $ticket_id );
+			}
+		}
+
+		$this->update_stats( array(
+			'sold'      => $sold_count,
+			'remaining' => $remaining_count,
+		) );
+	}
+
 
 	/**
 	 * Handle AJAX requests for client-side stats
