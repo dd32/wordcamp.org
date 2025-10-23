@@ -769,7 +769,7 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 							)
 						)
 					);
-					if ( $tickets_sold ) {
+					if ( $tickets_sold && $tickets_capacity ) {
 						echo '<br>' . number_format_i18n( $tickets_sold / $tickets_capacity * 100 ) . '%';
 					}
 					if ( $tickets_proposed ) {
