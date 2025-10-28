@@ -180,7 +180,7 @@ class CampTix_Payment_Method_Instamojo extends CampTix_Payment_Method {
 
 			// Request is valid, but this might be a webhook for a timed out payment / failed payment, where one has actually passed.
 			// Check the payment request to see what other statuses are.
-			$request = get_payment_request( $data['payment_request_id'] );
+			$request = $this->get_payment_request( $data['payment_request_id'] );
 			if ( $request ) {
 				$payment_data['payment_request'] = $request;
 			}
