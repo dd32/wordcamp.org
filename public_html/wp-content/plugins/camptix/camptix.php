@@ -2358,6 +2358,17 @@ class CampTix_Plugin {
 				} elseif ( $summarize_by == 'purchase_dayofweek' ) {
 					$date = mysql2date( 'l', $attendee->post_date );
 					$this->increment_summary( $summary, $date );
+				} elseif ( $summarize_by == 'purchase_week' ) {
+					$week = (int) mysql2date( 'W', $attendee->post_date );
+					$year = (int) mysql2date( 'Y', $attendee->post_date );
+					$month = (int) mysql2date( 'n', $attendee->post_date );
+					if ( 12 === $month && 1 === $week ) {
+						$year++;
+					}
+					$datetime = new \DateTime();
+					$datetime->setISODate( $year, $week );
+					$label = sprintf( "Week %s-%02d (starting %s)", $year, $week, $datetime->format('M j Y') );
+					$this->increment_summary( $summary, $label );
 				} elseif ( $summarize_by == 'coupon' ) {
 					$coupon = get_post_meta( $attendee->ID, 'tix_coupon', true );
 					if ( ! $coupon )
@@ -2388,6 +2399,7 @@ class CampTix_Plugin {
 			'purchase_time' => __( 'Purchase time', 'wordcamporg' ),
 			'purchase_datetime' => __( 'Purchase date and time', 'wordcamporg' ),
 			'purchase_dayofweek' => __( 'Purchase day of week', 'wordcamporg' ),
+			'purchase_week' => __( 'Purchase week', 'wordcamporg' ),
 		) );
 	}
 
