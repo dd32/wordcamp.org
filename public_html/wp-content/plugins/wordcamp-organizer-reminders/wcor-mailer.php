@@ -812,13 +812,19 @@ class WCOR_Mailer {
 		$emails         = $this->get_triggered_posts( $trigger );
 
 		foreach( $emails as $email ) {
+			if ( ! $this->applies_to_wordcamp( $wordcamp, $email ) ) {
+				continue;
+			}
+
+			if ( in_array( $email->ID, $sent_email_ids ) ) {
+				continue;
+			}
+
 			$recipient = $this->get_recipients( $wordcamp->ID, $email->ID );
 
-			if ( ! in_array( $email->ID, $sent_email_ids ) ) {
-				if ( $this->mail( $recipient, $email->post_title, $email->post_content, array(), $email, $wordcamp ) ) {
-					$sent_email_ids[] = $email->ID;
-					update_post_meta( $wordcamp->ID, 'wcor_sent_email_ids', $sent_email_ids );
-				}
+			if ( $this->mail( $recipient, $email->post_title, $email->post_content, array(), $email, $wordcamp ) ) {
+				$sent_email_ids[] = $email->ID;
+				update_post_meta( $wordcamp->ID, 'wcor_sent_email_ids', $sent_email_ids );
 			}
 		}
 	}
