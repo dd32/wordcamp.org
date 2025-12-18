@@ -304,7 +304,7 @@ class CampTix_Payment_Method_Instamojo extends CampTix_Payment_Method {
 		if ( ! preg_match( "/^[6-9][0-9]{9}$/", $attendee_phone ) ) {
 			$attendee_phone = '9999999999'; // No clearity about international number via API; thus using the example.
 		}
-		
+
 		$payload = Array(
 			'purpose'                 => substr( $productinfo, 0, 30 ), // https://github.com/wpindiaorg/camptix-indian-payments/issues/45#issuecomment-392804508
 			'amount'                  => $order_amount,
@@ -335,15 +335,43 @@ class CampTix_Payment_Method_Instamojo extends CampTix_Payment_Method {
 
 		// GET a response.
 		$response = wp_remote_post( $url, $params );
-		
+
 		// Check to see if the request was valid.
 		if ( ! is_wp_error( $response )  ) {
-
 			$json_decode = json_decode( $response['body']);
+			if ( empty( $json_decode->success ) ) {
+				$error_messages = '';
+				foreach ( $json_decode->message ?? [] as $key => $value ) {
+					$error_messages .= esc_html( $key . ' : ' . implode( ', ', $value ) ) . '<br />';
+				}
+				wp_die(
+					'<h1>Instamojo Payment Gateway Error</h1>' .
+					sprintf(
+						__( 'Error: %s', 'campt-indian-payment-gateway' ),
+						$error_messages ? $error_messages : 'Unknown error occurred'
+					),
+					'Instamojo Payment Gateway Error'
+				);
+				return;
+			}
+
+			if ( empty(  $json_decode->payment_request->longurl ) ) {
+				wp_die(
+					'<h1>Instamojo Payment Gateway Error</h1>' .
+					__( 'Error: Invalid payment URL from Instamojo', 'campt-indian-payment-gateway' ),
+					'Instamojo Payment Gateway Error'
+				);
+				return;
+			}
+
 			$long_url = $json_decode->payment_request->longurl;
 			header( 'Location:' . $long_url );
 		} else {
-			echo __( 'Invalid Instamojo Access Key & Token', 'campt-indian-payment-gateway' );
+			wp_die(
+				'<h1>Instamojo Payment Gateway Error</h1>' .
+				__( 'Invalid Instamojo Access Key & Token, or Instamojo unavailable.', 'campt-indian-payment-gateway' ),
+				'Instamojo Payment Gateway Error'
+			);
 			return;
 		}
 
