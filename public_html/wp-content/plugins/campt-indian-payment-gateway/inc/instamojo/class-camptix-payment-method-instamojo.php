@@ -268,47 +268,29 @@ class CampTix_Payment_Method_Instamojo extends CampTix_Payment_Method {
 			)
 		);
 
+		// Use the first attendee's details as the buyer info.
 		foreach ( $attendees as $attendee ) {
-			$tix_id             = get_post( get_post_meta( $attendee->ID, 'tix_ticket_id', true ) );
-			$attendee_questions = get_post_meta( $attendee->ID, 'tix_questions', true ); // Array of Attendee Questons
 			$email = $attendee->tix_email;
 			$name  = $attendee->tix_first_name . ' ' . $attendee->tix_last_name;
+			break;
 		}
 
-		$info       = $this->get_order( $payment_token );
-		$extra_info = array(
-			'phone' => get_post_meta( $info['attendee_id'], 'tix_phone', true ),
-		);
+		// Use the first attendee with a valid phone number. This may differ from the buyer.
+		foreach ( $attendees as $attendee ) {
+			$phone = $this->sanitize_phone_for_instamojo( $attendee->tix_phone );
+
+			// Use the first attendee entry with a valid phone number, hopefully the first one.
+			if ( $phone ) {
+				break;
+			}
+		}
 
 		$url = $this->options['sandbox'] ? 'https://test.instamojo.com/api/1.1/payment-requests/' : 'https://www.instamojo.com/api/1.1/payment-requests/';
-         
-		//It will execute when number is complete incomplete for validating instamojo number process.
-        
-		$phone = ltrim( $extra_info['phone'], '0' );
-		$phone = ltrim( $phone, '+91' ); // Remove '+91' CountyCode of India : Not supported by Instamojo. issue #43, #46
-		$phone = ltrim( $phone, '+' ); // Remove '+' for international attendee : Not supported by Instamojo. issue #43, #46
-		$phone = str_replace( array( ' ', '-', '.' ), '', $phone ); // Remove special characters : Not supported by Instamojo. issue #43, #46
-		if ( strlen($phone) > 10 ) {
-		    $attendee_phone = substr( $phone, -10 );
-		    $attendee_phone = ltrim( $attendee_phone, '0' );
-		    if ( strlen($attendee_phone) <= 9 ) {
-			$attendee_phone = str_pad( $attendee_phone, 10, '9', STR_PAD_LEFT);
-			}
-		} elseif ( strlen($phone) <= 9 ) {
-		     $attendee_phone = str_pad( $phone, 10, '9', STR_PAD_LEFT);
-		} else {
-			$attendee_phone = $phone; // Instamojo is expecting a 10 digit value.
-		}
-
-		// Indian mobile numbers start with 9,8,7, or 6. issue #43, #46
-		if ( ! preg_match( "/^[6-9][0-9]{9}$/", $attendee_phone ) ) {
-			$attendee_phone = '9999999999'; // No clearity about international number via API; thus using the example.
-		}
 
 		$payload = Array(
 			'purpose'                 => substr( $productinfo, 0, 30 ), // https://github.com/wpindiaorg/camptix-indian-payments/issues/45#issuecomment-392804508
 			'amount'                  => $order_amount,
-			'phone'                   => $attendee_phone,
+			'phone'                   => $phone,
 			'buyer_name'              => $name,
 			'redirect_url'            => $return_url,
 			'send_email'              => false,
@@ -341,8 +323,8 @@ class CampTix_Payment_Method_Instamojo extends CampTix_Payment_Method {
 			$json_decode = json_decode( $response['body']);
 			if ( empty( $json_decode->success ) ) {
 				$error_messages = '';
-				foreach ( $json_decode->message ?? [] as $key => $value ) {
-					$error_messages .= esc_html( $key . ' : ' . implode( ', ', $value ) ) . '<br />';
+				foreach ( $json_decode->message as $key => $value ) {
+					$error_messages .= esc_html( $key . ' : ' . implode( ', ', (array) $value ) ) . '<br />';
 				}
 				wp_die(
 					'<h1>Instamojo Payment Gateway Error</h1>' .
@@ -377,6 +359,37 @@ class CampTix_Payment_Method_Instamojo extends CampTix_Payment_Method {
 
 		return;
 
+	}
+
+	/**
+	 * Sanitize a phone number into the expected format.
+	 *
+	 * @param string $phone The phone number to sanitize.
+	 * @return bool|string The sanitized phone number, false on failure.
+	 */
+	public function sanitize_phone_for_instamojo( $phone ) {
+		$phone = ltrim( $phone, '0' );
+		$phone = ltrim( $phone, '+91' ); // Remove '+91' CountyCode of India : Not supported by Instamojo. issue #43, #46
+		$phone = ltrim( $phone, '+' ); // Remove '+' for international attendee : Not supported by Instamojo. issue #43, #46
+		$phone = str_replace( array( ' ', '-', '.' ), '', $phone ); // Remove special characters : Not supported by Instamojo. issue #43, #46
+		if ( strlen($phone) > 10 ) {
+			$phone = substr( $phone, -10 );
+			$phone = ltrim( $phone, '0' );
+			if ( strlen($phone) <= 9 ) {
+				$phone = str_pad( $phone, 10, '9', STR_PAD_LEFT);
+			}
+		} elseif ( strlen($phone) <= 9 ) {
+				$phone = str_pad( $phone, 10, '9', STR_PAD_LEFT);
+		} else {
+			$phone = $phone; // Instamojo is expecting a 10 digit value.
+		}
+
+		// Indian mobile numbers start with 9,8,7, or 6. issue #43, #46
+		if ( ! preg_match( "/^[6-9][0-9]{9}$/", $phone ) ) {
+			return false;
+		}
+	
+		return $phone;
 	}
 
 	/**
