@@ -133,7 +133,7 @@ class Test_WCOR_Mailer extends Database_TestCase {
 	 *
 	 * @param string $to      The expected recipient of the message.
 	 * @param string $subject The expected subject of the message.
-	 * @param string $body    The expected body of the message.
+	 * @param string $body    The expected body content (needle to search for in the email body).
 	 * @param bool   $result  The returned value from `wp_mail()`, if available. It defaults to `true` because it
 	 *                        isn't always accessible to the testing function.
 	 */
@@ -149,7 +149,7 @@ class Test_WCOR_Mailer extends Database_TestCase {
 
 		$this->assertSame( $to,      $mailer->get_recipient( 'to' )->address );
 		$this->assertSame( $subject, $mailer->get_sent()->subject );
-		$this->assertSame( $body,    $normalized_actual_body );
+		$this->assertStringContainsString( $body, $normalized_actual_body );
 	}
 
 	/**
@@ -172,7 +172,7 @@ class Test_WCOR_Mailer extends Database_TestCase {
 		$this->assert_mail_succeeded(
 			'dayton@wordcamp.org',
 			'WordCamp Dayton has been added to the final schedule',
-			"Huzzah! A new WordCamp is coming soon to Dayton, Ohio, USA! The lead organizer is janedoe, and the venue is at:\n\n3640 Colonel Glenn Hwy, Dayton, OH, US\n"
+			"<p>Huzzah! A new WordCamp is coming soon to Dayton, Ohio, USA! The lead organizer is janedoe, and the venue is at:</p>\n<p>3640 Colonel Glenn Hwy, Dayton, OH, US</p>\n"
 		);
 
 		$this->assertIsArray( $wordcamp->wcor_sent_email_ids );
@@ -224,7 +224,7 @@ class Test_WCOR_Mailer extends Database_TestCase {
 			$this->assert_mail_succeeded(
 				'sally.smith+trez@gmail.com',
 				"It's time to submit WordCamp Dayton reimbursement requests",
-				"Howdy Sally Smith, now's the perfect time to request reimbursement for any out of pocket expenses. You can do that at https://2019.dayton.wordcamp.org/wp-admin/edit.php?post_type=wcb_reimbursement.\n"
+				'<p>Howdy Sally Smith, now\'s the perfect time to request reimbursement for any out of pocket expenses. You can do that at <a href="https://2019.dayton.wordcamp.org/wp-admin/edit.php?post_type=wcb_reimbursement" rel="nofollow">https://2019.dayton.wordcamp.org/wp-admin/edit.php?post_type=wcb_reimbursement</a>.</p>' . "\n"
 			);
 
 			$this->assertIsArray( $wordcamp->wcor_sent_email_ids );
@@ -293,7 +293,7 @@ class Test_WCOR_Mailer extends Database_TestCase {
 		$this->assert_mail_succeeded(
 			'dayton@wordcamp.org',
 			'WordCamp Dayton has been added to the final schedule',
-			"Huzzah! A new WordCamp is coming soon to Dayton, Ohio, USA! The lead organizer is janedoe, and the venue is at:\n\n3640 Colonel Glenn Hwy, Dayton, OH, US\n",
+			"<p>Huzzah! A new WordCamp is coming soon to Dayton, Ohio, USA! The lead organizer is janedoe, and the venue is at:</p>\n<p>3640 Colonel Glenn Hwy, Dayton, OH, US</p>\n",
 			$result
 		);
 	}
@@ -327,8 +327,142 @@ class Test_WCOR_Mailer extends Database_TestCase {
 		$this->assert_mail_succeeded(
 			'other@wordcamp.org',
 			'This reminder is not for WordCamps',
-			"So it should not be sent to WordCamp.\n",
+			"<p>So it should not be sent to WordCamp.</p>\n",
 			$result
 		);
+	}
+
+	/**
+	 * Test that HTML content is preserved in emails.
+	 *
+	 * @covers WCOR_Mailer::mail
+	 * @covers WCOR_Mailer::maybe_send_html_email
+	 */
+	public function test_html_content_preserved() {
+		/** @var WCOR_Mailer $WCOR_Mailer */
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
+		global $WCOR_Mailer;
+
+		$html_reminder_id = self::factory()->post->create(
+			array(
+				'post_type'    => WCOR_Reminder::AUTOMATED_POST_TYPE_SLUG,
+				'post_title'   => 'HTML Email Test',
+				'post_content' => 'Check out this <a href="https://make.wordpress.org/community/">link</a> and this <strong>bold text</strong>.',
+			)
+		);
+
+		update_post_meta( $html_reminder_id, 'wcor_send_where', 'wcor_send_organizers' );
+
+		$message  = get_post( $html_reminder_id );
+		$wordcamp = get_post( self::$wordcamp_dayton_post_id );
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
+		$result   = $WCOR_Mailer->send_manual_email( $message, $wordcamp );
+
+		$mailer = tests_retrieve_phpmailer_instance();
+		$this->assertTrue( $result );
+		$this->assertNotFalse( $mailer->get_sent(), 'No email was sent.' );
+
+		$body = str_replace( "\r\n", "\n", $mailer->get_sent()->body );
+
+		// Verify HTML tags are preserved.
+		$this->assertStringContainsString( '<a href="https://make.wordpress.org/community/">link</a>', $body );
+		$this->assertStringContainsString( '<strong>bold text</strong>', $body );
+
+		// Verify wpautop added paragraph tags.
+		$this->assertStringContainsString( '<p>', $body );
+	}
+
+	/**
+	 * Test that dangerous HTML is sanitized.
+	 *
+	 * @covers WCOR_Mailer::mail
+	 */
+	public function test_html_sanitization() {
+		/** @var WCOR_Mailer $WCOR_Mailer */
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
+		global $WCOR_Mailer;
+
+		$dangerous_reminder_id = self::factory()->post->create(
+			array(
+				'post_type'    => WCOR_Reminder::AUTOMATED_POST_TYPE_SLUG,
+				'post_title'   => 'Sanitization Test',
+				'post_content' => 'This has a <table><tr><td>table</td></tr></table> and <code>code tags</code> and <pre>preformatted text</pre> which should be removed.',
+			)
+		);
+
+		update_post_meta( $dangerous_reminder_id, 'wcor_send_where', 'wcor_send_organizers' );
+
+		$message  = get_post( $dangerous_reminder_id );
+		$wordcamp = get_post( self::$wordcamp_dayton_post_id );
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
+		$result   = $WCOR_Mailer->send_manual_email( $message, $wordcamp );
+
+		$mailer = tests_retrieve_phpmailer_instance();
+		$this->assertTrue( $result );
+		$this->assertNotFalse( $mailer->get_sent(), 'No email was sent.' );
+
+		$body = str_replace( "\r\n", "\n", $mailer->get_sent()->body );
+
+		// Verify email-unsafe tags are removed.
+		$this->assertStringNotContainsString( '<table>', $body );
+		$this->assertStringNotContainsString( '<code>', $body );
+		$this->assertStringNotContainsString( '<pre>', $body );
+
+		// Verify content is still present.
+		$this->assertStringContainsString( 'table', $body );
+		$this->assertStringContainsString( 'code tags', $body );
+		$this->assertStringContainsString( 'preformatted text', $body );
+	}
+
+	/**
+	 * Test that plain-text fallback is generated.
+	 *
+	 * @covers WCOR_Mailer::maybe_send_html_email
+	 */
+	public function test_plain_text_fallback() {
+		/** @var WCOR_Mailer $WCOR_Mailer */
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
+		global $WCOR_Mailer;
+
+		$html_reminder_id = self::factory()->post->create(
+			array(
+				'post_type'    => WCOR_Reminder::AUTOMATED_POST_TYPE_SLUG,
+				'post_title'   => 'Plain Text Fallback Test',
+				'post_content' => 'Visit <a href="https://central.wordcamp.org/">WordCamp Central</a> for more info.',
+			)
+		);
+
+		update_post_meta( $html_reminder_id, 'wcor_send_where', 'wcor_send_organizers' );
+
+		$message  = get_post( $html_reminder_id );
+		$wordcamp = get_post( self::$wordcamp_dayton_post_id );
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
+		$result   = $WCOR_Mailer->send_manual_email( $message, $wordcamp );
+
+		$mailer = tests_retrieve_phpmailer_instance();
+		$this->assertTrue( $result );
+		$this->assertNotFalse( $mailer->get_sent(), 'No email was sent.' );
+
+		// Get the MIME body which contains both HTML and plain-text parts.
+		$mime_body = str_replace( "\r\n", "\n", $mailer->get_sent()->body );
+
+		// Extract the plain-text part from the MIME body.
+		// Look for the plain text section between Content-Type: text/plain and the next boundary.
+		preg_match( '/Content-Type: text\/plain.*?\n\n(.*?)\n--/s', $mime_body, $matches );
+		$this->assertNotEmpty( $matches, 'Plain-text part not found in MIME body.' );
+
+		$alt_body = isset( $matches[1] ) ? trim( $matches[1] ) : '';
+
+		// Verify plain text version has no HTML tags.
+		$this->assertStringNotContainsString( '<a', $alt_body );
+		$this->assertStringNotContainsString( '<p>', $alt_body );
+
+		// Verify content is still present.
+		$this->assertStringContainsString( 'Visit', $alt_body );
+		$this->assertStringContainsString( 'WordCamp Central', $alt_body );
+
+		// Verify the URL is preserved in markdown-style format [text](URL).
+		$this->assertStringContainsString( 'https://central.wordcamp.org/', $alt_body );
+		$this->assertStringContainsString( '[WordCamp Central](https://central.wordcamp.org/)', $alt_body );
 	}
 }
