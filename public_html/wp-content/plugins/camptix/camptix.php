@@ -5587,6 +5587,15 @@ class CampTix_Plugin {
 	 */
 	function shortcode_callback( $atts ) {
 		if ( ! $this->did_template_redirect ) {
+			// The shortcode was called outside of the normal flow, if this happened as part of a REST API request that's somewhat expected.
+			if ( wp_is_serving_rest_request() ) {
+				return sprintf(
+					'<a href="%s">%s</a>',
+					get_permalink(),
+					__( 'Please view this page in a browser to purchase or manage tickets.', 'wordcamporg' )
+				);
+			}
+
 			$this->log( 'Something is seriously wrong, did_template_redirect is false.', 0, null, 'critical' );
 			return __( 'An error has occurred.', 'wordcamporg' );
 		}
