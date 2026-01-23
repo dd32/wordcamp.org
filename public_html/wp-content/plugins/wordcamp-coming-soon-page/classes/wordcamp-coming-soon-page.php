@@ -70,6 +70,9 @@ class WordCamp_Coming_Soon_Page {
 			array( 'open-sans' ),
 			2
 		);
+
+		// Jetpack Contact Form module. Should be enqueued by rendering, but a change in core rendering has caused it to not apply.
+		wp_enqueue_style( 'grunion.css' );
 	}
 
 	/**
