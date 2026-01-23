@@ -24,6 +24,10 @@ add_action( 'grunion_after_feedback_post_inserted', __NAMESPACE__ . '\grunion_af
  * @param array $entry_values The raw entry values.
  */
 function grunion_after_feedback_post_inserted( $post_id, $fields, $is_spam, $entry_values ) {
+	if ( $is_spam ) {
+		return;
+	}
+
 	switch ( $entry_values['entry_permalink'] ?? '' ) {
 		// The Campus Connect Organize form.
 		case 'https://events.wordpress.org/campusconnect/organize/':
@@ -63,9 +67,7 @@ function create_campus_connect_tracker( $post_id, $fields, $is_spam, $entry_valu
 	$application_data = [
 		'Form URL' => admin_url( 'admin.php?page=jetpack-forms-admin' ) . '#/responses?r=' . $post_id,
 	];
-	if ( $is_spam ) {
-		$application_data['Jetpack Marked as Spam'] = 'Yes';
-	}
+
 	foreach ( $fields as $field_id => $field ) {
 		$application_data[ $field->attributes['label'] ?? $field_id ] = $field->value;
 	}
