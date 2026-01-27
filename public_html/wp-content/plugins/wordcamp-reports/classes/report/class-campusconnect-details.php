@@ -194,9 +194,10 @@ class CampusConnect_Details extends WordCamp_Details {
 			'Number of Anticipated Attendees' => 'checked',
 			'Tracker URL'                     => 'checked',
 			'URL'                             => 'checked',
-			'ID'                              => 'checked',
 			'Actual Attendees'				  => 'checked',
 			'Series Event'					  => 'checked',
+			'Created'						  => 'checked',
+			'ID'                              => 'checked',
 		);
 		foreach ( $_REQUEST['fields'] ?? array() as $field ) {
 			$field_defaults[ $field ] = 'checked';
