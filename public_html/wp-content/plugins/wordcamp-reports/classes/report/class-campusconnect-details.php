@@ -135,6 +135,27 @@ class CampusConnect_Details extends WordCamp_Details {
 	}
 
 	/**
+	 * Fill in missing City/Country data from the Location field.
+	 *
+	 * @param WP_Post $event The event post object.
+	 *
+	 * @return array The data row.
+	 */
+	public function fill_data_row( $row ) {
+		$row = parent::fill_data_row( $row );
+
+		// If the venue address isn't set, Extract the details from the Location.
+		if ( empty( $row['_venue_city'] ) || empty( $row['_venue_country_name'] ) ) {
+			list( $city, $country ) = explode( ',', $row['Location'], 2 ) + array( '', '' );
+
+			$row['_venue_city']         = $row['_venue_city'] ?: trim( $city );
+			$row['_venue_country_name'] = $row['_venue_country_name'] ?: trim( $country );
+		}
+
+		return $row;
+	}
+
+	/**
 	 * Get WordCamp posts that fit the report criteria.
 	 *
 	 * @return array An array of WP_Post objects.
