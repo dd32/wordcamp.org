@@ -86,6 +86,9 @@ class CampusConnect_Details extends WordCamp_Details {
 				'_venue_city',
 				'_venue_country_name',
 				'Number of Anticipated Attendees',
+				'Actual Attendees',
+				'Series Event',
+				'Created',
 				'Tracker URL',
 				'URL',
 				'ID',
@@ -194,6 +197,9 @@ class CampusConnect_Details extends WordCamp_Details {
 			'Number of Anticipated Attendees' => 'checked',
 			'Tracker URL'                     => 'checked',
 			'URL'                             => 'checked',
+			'Actual Attendees'                => 'checked',
+			'Series Event'                    => 'checked',
+			'Created'                         => 'checked',
 			'ID'                              => 'checked',
 		);
 		foreach ( $_REQUEST['fields'] ?? array() as $field ) {
