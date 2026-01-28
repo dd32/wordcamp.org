@@ -97,6 +97,7 @@ function create_campus_connect_tracker( $post_id, $fields, $is_spam, $entry_valu
 	add_post_meta( $post_id, 'Number of Anticipated Attendees', $attendees );
 	add_post_meta( $post_id, 'WordPress.org Username', $wporg ?: ( $user->user_login ?? '' ) );
 	add_post_meta( $post_id, 'Venue Name', $campus );
+	add_post_meta( $post_id, 'Physical Address', implode( "\n", array_filter( [ $campus, $city, $country ] ) );
 
 	add_post_meta(
 		$post_id,
