@@ -397,7 +397,8 @@ class WordCamp_QBO {
 
 			For International Wire Transfers:
 			Beneficiary Name: WordPress Community Support, PBC
-			Banking Address: 132 Hawthorne St, San Francisco, CA 94107-1308, USA
+			Mailing Address: 660 4th St #119, San Francisco, CA 94107, USA
+
 			Bank Name: JPMorgan Chase Bank, N.A.
 			Bank Address: 270 Park Ave, New York, NY 10017, USA
 			Bank Routing and Transit Number: 021000021
