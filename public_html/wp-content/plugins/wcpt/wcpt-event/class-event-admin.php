@@ -987,12 +987,7 @@ abstract class Event_Admin {
 						?>
 
 						<?php if ( ! empty( $messages[ $key ] ) ) : ?>
-							<?php
-							if ( 'textarea' == $value ) {
-								echo '<br />';
-							}
-							?>
-
+							<br>
 							<span class="description"><?php echo esc_html( $messages[ $key ] ); ?></span>
 						<?php endif; ?>
 					</p>

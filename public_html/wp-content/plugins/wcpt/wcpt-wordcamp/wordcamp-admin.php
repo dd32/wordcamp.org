@@ -1545,8 +1545,9 @@ function wcpt_metabox( $meta_keys, $metabox ) {
 
 	// @todo When you refactor meta_keys() to support changing labels -- see note in meta_keys() -- also make it support these notes.
 	$messages = array(
-		'Telephone'                       => 'Required for shipping.',
+		'Telephone'                       => 'Required for shipping. Please use the +12.3456... format.',
 		'Mailing Address'                 => 'Shipping address.',
+		'Location'                        => "Please use the format '{City}, {Country}' or {City}, {StateCode}, {Country} for USA.",
 		'Twitter'                         => 'Should begin with @. Ex. @wordpress',
 		'WordCamp Hashtag'                => 'Should begin with #. Ex. #wcus',
 		'Actual Attendees'                => 'Number of attendees who actually attended the event.',
