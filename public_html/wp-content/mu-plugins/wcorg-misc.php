@@ -353,7 +353,9 @@ add_filter( 'wordcamp_google_maps_api_key', function( $key, $scope = 'client' ) 
 
 		case 'development':
 		default:
-			if ( defined( 'WORDCAMP_DEV_GOOGLE_MAPS_API_KEY' ) ) {
+			if ( 'server' === $scope && defined( 'WORDCAMP_DEV_GOOGLE_MAPS_SERVER_API_KEY') ) {
+				$key = WORDCAMP_DEV_GOOGLE_MAPS_SERVER_API_KEY;
+			} elseif ( defined( 'WORDCAMP_DEV_GOOGLE_MAPS_API_KEY' ) ) {
 				$key = WORDCAMP_DEV_GOOGLE_MAPS_API_KEY;
 			}
 			break;
