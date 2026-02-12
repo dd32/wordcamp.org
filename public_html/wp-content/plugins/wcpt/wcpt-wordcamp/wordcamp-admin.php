@@ -122,6 +122,39 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 		}
 
 		/**
+		 * Get searchable post meta keys for WordCamp events.
+		 *
+		 * Returns a limited list of meta keys that are useful for searching.
+		 * Focuses on names, locations, and text fields while excluding URLs, dates, and numeric fields.
+		 *
+		 * @return array List of meta keys to search.
+		 */
+		public static function get_searchable_meta_keys() {
+			return array(
+				'Organizer Name',
+				'WordPress.org Username',
+				'Location',
+				'Venue Name',
+				'Physical Address',
+				'Sponsor Wrangler Name',
+				'Budget Wrangler Name',
+				'Venue Wrangler Name',
+				'Speaker Wrangler Name',
+				'Food/Beverage Wrangler Name',
+				'Swag Wrangler Name',
+				'Volunteer Wrangler Name',
+				'Printing Wrangler Name',
+				'Design Wrangler Name',
+				'Website Wrangler Name',
+				'Social Media/Publicity Wrangler Name',
+				'A/V Wrangler Name',
+				'Party Wrangler Name',
+				'Travel Wrangler Name',
+				'Safety Wrangler Name',
+			);
+		}
+
+		/**
 		 * Check if a field is readonly.
 		 *
 		 * @param string $key
