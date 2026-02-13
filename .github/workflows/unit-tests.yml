@@ -7,12 +7,16 @@ on:
     - public_html/**
     - .github/workflows/**
     - phpunit.*
+    - .wp-env.json
+    - wp-env-db-dropin.php
   push:
     branches: [production]
     paths:
     - public_html/**
     - .github/workflows/**
     - phpunit.*
+    - .wp-env.json
+    - wp-env-db-dropin.php
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -55,24 +59,17 @@ jobs:
       matrix:
         php-version: ['8.1', '8.4', '8.5']
 
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: false
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: wcorg_test
-        ports:
-          - 3306/tcp
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install SVN
-      run: |
-        sudo rm -f /var/lib/man-db/auto-update # https://github.com/actions/runner-images/issues/10977
-        sudo apt-get update && sudo apt-get install -y subversion
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: yarn
+
+    - name: Install Node dependencies
+      run: yarn install --frozen-lockfile
 
     - name: Set PHP version
       uses: shivammathur/setup-php@v2
@@ -83,17 +80,18 @@ jobs:
       env:
           COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Start mysql service
-      run: sudo /etc/init.d/mysql start
-
-    - name: Install dependencies
+    - name: Install Composer dependencies
       run: |
         rm composer.lock || true
         composer install
 
-    - name: Install WordPress
+    - name: Configure wp-env PHP version
       run: |
-        bash .docker/bin/install-wp-tests.sh wcorg_test root root 127.0.0.1 latest
+        echo '{ "phpVersion": "${{ matrix.php-version }}", "env": { "tests": { "phpVersion": "${{ matrix.php-version }}" } } }' > .wp-env.override.json
+
+    - name: Start wp-env
+      run: npx wp-env start
 
     - name: Running unit tests
-      run: ./public_html/wp-content/mu-plugins/vendor/bin/phpunit -c phpunit.xml.dist
+      run: |
+        npx wp-env run tests-cli "bash -c 'export WP_TESTS_DIR=/wordpress-phpunit && cd /var/www/html/wordcamp-project && /var/www/html/wordcamp-project/public_html/wp-content/mu-plugins/vendor/bin/phpunit -c phpunit.xml.dist'"

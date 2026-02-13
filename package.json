@@ -22,6 +22,16 @@
 		"public_html/wp-content/themes/wporg-events-2023",
 		"public_html/wp-content/themes/wporg-flagship-landing"
 	],
+	"scripts": {
+		"wp-env": "wp-env",
+		"wp-env:start": "wp-env start",
+		"wp-env:stop": "wp-env stop",
+		"wp-env:setup-multisite": "wp-env run cli 'wp core multisite-install --title=WordCamp --base=/ --admin_user=admin --admin_password=password --admin_email=admin@example.org'",
+		"test:php": "wp-env run tests-cli \"bash -c 'export WP_TESTS_DIR=/wordpress-phpunit && cd /var/www/html/wordcamp-project && /var/www/html/wordcamp-project/public_html/wp-content/mu-plugins/vendor/bin/phpunit -c phpunit.xml.dist'\""
+	},
+	"devDependencies": {
+		"@wordpress/env": "^5.8.0"
+	},
 	"browserslist": [
 		"extends @wordpress/browserslist-config"
 	]

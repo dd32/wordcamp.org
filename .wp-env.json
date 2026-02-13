@@ -1,0 +1,40 @@
+{
+	"core": null,
+	"phpVersion": "8.4",
+	"port": 8888,
+	"testsPort": 8889,
+	"plugins": [],
+	"themes": [],
+	"mappings": {
+		"wp-content/db.php": "./wp-env-db-dropin.php",
+		"wp-content/mu-plugins": "./public_html/wp-content/mu-plugins",
+		"wp-content/mu-plugins-private": "./public_html/wp-content/mu-plugins-private",
+		"wp-content/plugins": "./public_html/wp-content/plugins",
+		"wp-content/themes": "./public_html/wp-content/themes",
+		"wp-content/sunrise.php": "./public_html/wp-content/sunrise.php",
+		"wp-content/sunrise-wordcamp.php": "./public_html/wp-content/sunrise-wordcamp.php",
+		"wp-content/sunrise-events.php": "./public_html/wp-content/sunrise-events.php",
+		"wordcamp-project": "."
+	},
+	"config": {
+		"WP_DEBUG": true,
+		"WP_DEBUG_LOG": true,
+		"WP_DEBUG_DISPLAY": true,
+		"SCRIPT_DEBUG": false,
+		"DISALLOW_UNFILTERED_HTML": true
+	},
+	"env": {
+		"tests": {
+			"phpVersion": "8.4",
+			"port": 8889,
+			"mappings": {
+				"wp-content/db.php": "./wp-env-db-dropin.php",
+				"wordcamp-project": "."
+			},
+			"config": {
+				"WP_TESTS_MULTISITE": true,
+				"WP_DEBUG": true
+			}
+		}
+	}
+}
