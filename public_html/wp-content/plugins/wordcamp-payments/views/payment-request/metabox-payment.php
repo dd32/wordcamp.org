@@ -52,6 +52,14 @@
 			<?php esc_html_e( 'Please make sure that you upload an authorization form above, if one is required by the vendor.', 'wordcamporg' ); ?>
 		</p>
 
+		<div id="payment_method_sepa_transfer_fields" class="form-table payment_method_fields <?php echo 'sepa_transfer' == $selected_payment_method ? 'active' : 'hidden'; ?>">
+			<table>
+				<?php $this->render_text_input( $post, esc_html__( 'Account Name', 'wordcamporg' ), 'sepa_account_name' ); ?>
+				<?php $this->render_text_input( $post, esc_html__( 'BIC',          'wordcamporg' ), 'sepa_bic'          ); ?>
+				<?php $this->render_text_input( $post, esc_html__( 'IBAN',         'wordcamporg' ), 'sepa_iban'         ); ?>
+			</table>
+		</div>
+
 		<div id="payment_method_wire_fields" class="form-table payment_method_fields <?php echo 'Wire' == $selected_payment_method ? 'active' : 'hidden'; ?>">
 			<h3>
 				<?php esc_html_e( 'Beneficiary’s Bank', 'wordcamporg' ); ?>
