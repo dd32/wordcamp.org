@@ -9,6 +9,16 @@ docker-compose.override.yaml
 
 
 #
+# DDEV
+#
+.ddev/.ddev-docker-compose-*
+.ddev/db_snapshots
+.ddev/.global_commands
+.ddev/.homeadditions
+.ddev/.sso-config
+
+
+#
 # Misc
 #
 .phpunit
