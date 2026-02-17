@@ -6,8 +6,7 @@ webserver_type: nginx-fpm
 database:
   type: mariadb
   version: "10.11"
-disable_settings_management:
-  php: true
+disable_settings_management: true
 additional_fqdns:
   - wordcamp.test
   - central.wordcamp.test
