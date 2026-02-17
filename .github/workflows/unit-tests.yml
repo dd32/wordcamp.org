@@ -71,6 +71,9 @@ jobs:
     - name: Install Node dependencies
       run: yarn
 
+    - name: Build JS assets
+      run: yarn workspaces run build
+
     - name: Set PHP version for Composer
       uses: shivammathur/setup-php@v2
       with:
