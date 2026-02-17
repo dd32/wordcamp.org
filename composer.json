@@ -58,16 +58,6 @@
 			"type": "package",
 			"package": [
 				{
-					"name": "wordpress-plugin/bbpress",
-					"type": "wordpress-plugin",
-					"version": "2.6",
-					"source": {
-						"type": "svn",
-						"url": "https://plugins.svn.wordpress.org/bbpress/",
-						"reference": "branches/2.6/"
-					}
-				},
-				{
 					"name": "wordpress-meta/wporg-profiles-wp-activity-notifier",
 					"type": "wordpress-plugin",
 					"version": "1.1",
@@ -94,7 +84,6 @@
 		"spatie/phpunit-watcher": "^1.23",
 		"yoast/phpunit-polyfills": "^4.0",
 		"composer/installers": "^2.2",
-		"wordpress-plugin/bbpress": "2.6.*",
 		"wordpress-meta/wporg-profiles-wp-activity-notifier": "1.1",
 		"wporg/wporg-mu-plugins": "dev-build",
 		"quickbooks/v3-php-sdk": "*"

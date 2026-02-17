@@ -6,6 +6,7 @@
 	"testsPort": 8889,
 	"plugins": [
 		"akismet",
+		"bbpress",
 		"classic-editor",
 		"custom-content-width",
 		"edit-flow",
