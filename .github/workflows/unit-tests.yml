@@ -71,6 +71,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        ddev exec composer config --global github-oauth.github.com "${{ secrets.GITHUB_TOKEN }}"
         ddev exec "rm composer.lock || true"
         ddev exec composer install
 
