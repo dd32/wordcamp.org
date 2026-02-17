@@ -12,6 +12,7 @@ if ( file_exists( $vendor_autoload ) ) {
 	require_once $vendor_autoload;
 }
 
+const WORDCAMP_ENVIRONMENT  = 'local';
 const WORDCAMP_NETWORK_ID   = 1;
 const WORDCAMP_ROOT_BLOG_ID = 5;
 const EVENTS_NETWORK_ID     = 2;
