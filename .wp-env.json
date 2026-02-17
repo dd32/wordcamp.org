@@ -29,7 +29,6 @@
 	],
 	"config": {
 		"IS_WORDCAMP_NETWORK": true,
-		"WORDCAMP_ENVIRONMENT": "local",
 		"WP_ENVIRONMENT_TYPE": "local",
 		"SUNRISE": true,
 		"SUBDOMAIN_INSTALL": true,
@@ -53,7 +52,8 @@
 		"DISALLOW_UNFILTERED_HTML": true,
 		"WORDCAMP_QBO_HMAC_KEY": "localhmac",
 		"EMAIL_DEVELOPER_NOTIFICATIONS": "developers@example.test",
-		"EMAIL_CENTRAL_SUPPORT": "support@central.wordcamp.test"
+		"EMAIL_CENTRAL_SUPPORT": "support@central.wordcamp.test",
+		"WORDCAMP_ENVIRONMENT": "local"
 	},
 	"mappings": {
 		"wp-content/mu-plugins": "./public_html/wp-content/mu-plugins",

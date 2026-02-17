@@ -12,6 +12,7 @@ docker-compose.override.yaml
 # wp-env
 #
 .wp-env-home
+.wp-env.override.json
 
 
 #

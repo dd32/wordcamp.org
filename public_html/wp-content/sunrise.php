@@ -134,4 +134,10 @@ function get_domain_network_id( string $domain ): int {
 	}
 }
 
+// During wp-env initial install, constants aren't yet in wp-config.php.
+// Return early to avoid fatal errors; sunrise will work on subsequent loads.
+if ( ! defined( 'WORDCAMP_ENVIRONMENT' ) ) {
+	return;
+}
+
 load_network_sunrise();
