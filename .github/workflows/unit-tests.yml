@@ -89,7 +89,7 @@ jobs:
       run: ddev start
 
     - name: Install WP test suite
-      run: ddev exec bash .docker/bin/install-wp-tests.sh wcorg_test db db db latest
+      run: ddev exec bash .docker/bin/install-wp-tests.sh wcorg_test root root db latest
 
     - name: Running unit tests
       run: ddev exec ./public_html/wp-content/mu-plugins/vendor/bin/phpunit -c phpunit.xml.dist
