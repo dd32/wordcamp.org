@@ -56,8 +56,8 @@
 		"WORDCAMP_ENVIRONMENT": "local"
 	},
 	"mappings": {
-		"wp-content/mu-plugins/0-aaa-wp-env-constants.php": "./.wp-env/0-early-mu-plugin.php",
 		"wp-content/mu-plugins": "./public_html/wp-content/mu-plugins",
+		"wp-content/mu-plugins/0-aaa-wp-env-constants.php": "./.wp-env/0-early-mu-plugin.php",
 		"wp-content/plugins": "./public_html/wp-content/plugins",
 		"wp-content/sunrise.php": "./public_html/wp-content/sunrise.php",
 		"wp-content/sunrise-wordcamp.php": "./public_html/wp-content/sunrise-wordcamp.php",
@@ -76,8 +76,8 @@
 				"WP_TESTS_MULTISITE": 1
 			},
 			"mappings": {
-				"wp-content/mu-plugins/0-aaa-wp-env-constants.php": "./.wp-env/0-early-mu-plugin.php",
 				"wp-content/mu-plugins": "./public_html/wp-content/mu-plugins",
+				"wp-content/mu-plugins/0-aaa-wp-env-constants.php": "./.wp-env/0-early-mu-plugin.php",
 				"wp-content/plugins": "./public_html/wp-content/plugins",
 				"wp-content/sunrise.php": "./public_html/wp-content/sunrise.php",
 				"wp-content/sunrise-wordcamp.php": "./public_html/wp-content/sunrise-wordcamp.php",

@@ -1,8 +1,8 @@
 <?php
 /**
- * wp-env early-loading mu-plugin.
+ * Wp-env early-loading mu-plugin.
  *
- * wp-env runs `wp core install` before `wp config set`, so custom constants
+ * Wp-env runs `wp core install` before `wp config set`, so custom constants
  * aren't available when mu-plugins first load during installation. This file
  * provides safe defaults so the mu-plugins don't cause fatal errors during
  * that initial bootstrap.
