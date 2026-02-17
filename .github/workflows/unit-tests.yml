@@ -58,6 +58,20 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        coverage: none
+        tools: composer:v2
+      env:
+        COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install dependencies
+      run: |
+        rm composer.lock || true
+        composer install
+
     - name: Setup DDEV
       uses: ddev/github-action-setup-ddev@v1
       with:
@@ -68,12 +82,6 @@ jobs:
 
     - name: Start DDEV
       run: ddev start
-
-    - name: Install dependencies
-      run: |
-        ddev exec composer config --global github-oauth.github.com "${{ secrets.GITHUB_TOKEN }}"
-        ddev exec "rm composer.lock || true"
-        ddev exec composer install
 
     - name: Install WP test suite
       run: ddev exec bash .docker/bin/install-wp-tests.sh wcorg_test db db db latest
