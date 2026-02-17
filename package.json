@@ -30,7 +30,7 @@
 	"scripts": {
 		"wp-env:start": "wp-env start",
 		"wp-env:stop": "wp-env stop",
-		"wp-env:test:php": "wp-env run tests-cli --env-cwd=/var/www/html phpunit -c phpunit.xml.dist",
+		"wp-env:test:php": "wp-env run tests-cli --env-cwd=/var/www/html /var/www/html/vendor/bin/phpunit -c phpunit.xml.dist",
 		"wp-env:destroy": "wp-env destroy"
 	},
 	"browserslist": [

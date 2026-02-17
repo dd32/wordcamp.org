@@ -55,45 +55,41 @@ jobs:
       matrix:
         php-version: ['8.1', '8.4', '8.5']
 
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: false
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: wcorg_test
-        ports:
-          - 3306/tcp
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install SVN
-      run: |
-        sudo rm -f /var/lib/man-db/auto-update # https://github.com/actions/runner-images/issues/10977
-        sudo apt-get update && sudo apt-get install -y subversion
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
 
-    - name: Set PHP version
+    - uses: actions/cache@v4
+      with:
+        path: '**/node_modules'
+        key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+    - name: Install Node dependencies
+      run: yarn
+
+    - name: Set PHP version for Composer
       uses: shivammathur/setup-php@v2
       with:
-        php-version: ${{ matrix.php-version }}
+        php-version: '8.1'
         coverage: none
         tools: composer:v2
       env:
-          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Start mysql service
-      run: sudo /etc/init.d/mysql start
-
-    - name: Install dependencies
+    - name: Install Composer dependencies
       run: |
         rm composer.lock || true
         composer install
 
-    - name: Install WordPress
-      run: |
-        bash .docker/bin/install-wp-tests.sh wcorg_test root root 127.0.0.1 latest
+    - name: Configure wp-env for PHP ${{ matrix.php-version }}
+      run: echo '{"phpVersion":"${{ matrix.php-version }}","port":8888}' > .wp-env.override.json
 
-    - name: Running unit tests
-      run: ./public_html/wp-content/mu-plugins/vendor/bin/phpunit -c phpunit.xml.dist
+    - name: Start wp-env
+      run: npx wp-env start
+
+    - name: Run PHPUnit
+      run: npx wp-env run tests-cli --env-cwd=/var/www/html /var/www/html/vendor/bin/phpunit -c phpunit.xml.dist
