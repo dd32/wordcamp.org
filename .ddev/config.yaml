@@ -1,0 +1,20 @@
+name: wordcamp
+type: php
+docroot: public_html/mu
+php_version: "8.5"
+webserver_type: nginx-fpm
+database:
+  type: mariadb
+  version: "10.11"
+disable_settings_management: true
+additional_fqdns:
+  - wordcamp.test
+  - central.wordcamp.test
+  - seattle.wordcamp.test
+  - shinynew.wordcamp.test
+  - narnia.wordcamp.test
+  - events.wordpress.test
+  - campus.wordpress.test
+hooks:
+  post-start:
+    - exec: bash /var/www/html/.ddev/setup.sh

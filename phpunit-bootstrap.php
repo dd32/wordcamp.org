@@ -1,10 +1,18 @@
 <?php
 
+// Detect DDEV environment (runs inside /var/www/html).
+$is_ddev = str_starts_with( __DIR__, '/var/www/html' );
+
 // Require composer dependencies.
-if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
-	require_once __DIR__ . '/vendor/autoload.php';
+$vendor_autoload = $is_ddev
+	? '/var/www/html/vendor/autoload.php'
+	: __DIR__ . '/vendor/autoload.php';
+
+if ( file_exists( $vendor_autoload ) ) {
+	require_once $vendor_autoload;
 }
 
+const WORDCAMP_ENVIRONMENT  = 'local';
 const WORDCAMP_NETWORK_ID   = 1;
 const WORDCAMP_ROOT_BLOG_ID = 5;
 const EVENTS_NETWORK_ID     = 2;
@@ -14,14 +22,24 @@ const CAMPUS_ROOT_BLOG_ID   = 47;
 const SITE_ID_CURRENT_SITE  = WORDCAMP_NETWORK_ID;
 const BLOG_ID_CURRENT_SITE  = WORDCAMP_ROOT_BLOG_ID;
 
-define( 'WP_PLUGIN_DIR', __DIR__ . '/public_html/wp-content/plugins' );
-define( 'SUT_WP_CONTENT_DIR', __DIR__ . '/public_html/wp-content/' ); // WP_CONTENT_DIR will be in `WP_TESTS_DIR`.
-define( 'SUT_WPMU_PLUGIN_DIR', SUT_WP_CONTENT_DIR . '/mu-plugins' ); // WPMU_PLUGIN_DIR will be in `WP_TESTS_DIR`.
+if ( $is_ddev ) {
+	define( 'WP_PLUGIN_DIR', '/var/www/html/public_html/wp-content/plugins' );
+	define( 'SUT_WP_CONTENT_DIR', '/var/www/html/public_html/wp-content/' );
+} else {
+	define( 'WP_PLUGIN_DIR', __DIR__ . '/public_html/wp-content/plugins' );
+	define( 'SUT_WP_CONTENT_DIR', __DIR__ . '/public_html/wp-content/' ); // WP_CONTENT_DIR will be in `WP_TESTS_DIR`.
+}
+define( 'SUT_WPMU_PLUGIN_DIR', SUT_WP_CONTENT_DIR . 'mu-plugins' ); // WPMU_PLUGIN_DIR will be in `WP_TESTS_DIR`.
 
 $core_tests_directory = getenv( 'WP_TESTS_DIR' );
 
 if ( ! $core_tests_directory ) {
-	$core_tests_directory = rtrim( sys_get_temp_dir(), '/\\' ) . '/wp/wordpress-tests-lib';
+	if ( $is_ddev && is_dir( '/tmp/wp/wordpress-tests-lib' ) ) {
+		$core_tests_directory = '/tmp/wp/wordpress-tests-lib';
+	} else {
+		$core_tests_directory = rtrim( sys_get_temp_dir(), '/\\' ) . '/wp/wordpress-tests-lib';
+	}
+
 	// Necessary for the CampTix tests.
 	putenv( "WP_TESTS_DIR=$core_tests_directory" );
 }

@@ -31,7 +31,7 @@ function main() {
  * Get the URL to redirect to, if any.
  */
 function get_redirect_url( string $request_uri ): string {
-	$domain       = 'events.wordpress.' . get_top_level_domain();
+	$domain       = strtolower( strtok( $_SERVER['HTTP_HOST'] ?? '', ':' ) );
 	$old_full_url = sprintf(
 		'https://%s/%s',
 		$domain,
@@ -68,8 +68,11 @@ function get_redirect_url( string $request_uri ): string {
 function set_network_and_site() {
 	global $current_site, $current_blog, $blog_id, $site_id, $domain, $path, $public;
 
+	$host       = strtolower( strtok( $_SERVER['HTTP_HOST'] ?? '', ':' ) );
+	$network_id = \WordCamp\Sunrise\get_domain_network_id( $host );
+
 	// Originally WP referred to networks as "sites" and sites as "blogs".
-	$current_site = WP_Network::get_instance( SITE_ID_CURRENT_SITE );
+	$current_site = WP_Network::get_instance( $network_id );
 	$site_id      = $current_site->id;
 	$path         = stripslashes( $_SERVER['REQUEST_URI'] );
 
@@ -80,7 +83,7 @@ function set_network_and_site() {
 
 		list( $path ) = explode( '?', $path );
 
-		$current_blog = get_site_by_path( DOMAIN_CURRENT_SITE, $path, 3 );
+		$current_blog = get_site_by_path( $host, $path, 3 );
 
 	} elseif (
 		CAMPUS_NETWORK_ID === $site_id &&
@@ -92,9 +95,9 @@ function set_network_and_site() {
 
 		list( $path ) = explode( '?', $path );
 
-		$current_blog = get_site_by_path( DOMAIN_CURRENT_SITE, $path, 2 );
+		$current_blog = get_site_by_path( $host, $path, 2 );
 	} else {
-		$current_blog = WP_Site::get_instance( BLOG_ID_CURRENT_SITE ); // The Root site constant defined in wp-config.php.
+		$current_blog = WP_Site::get_instance( $current_site->blog_id );
 	}
 
 	if ( ! $current_blog ) {
