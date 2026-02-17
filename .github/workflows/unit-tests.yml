@@ -80,6 +80,11 @@ jobs:
       env:
         COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Install SVN
+      run: |
+        sudo rm -f /var/lib/man-db/auto-update
+        sudo apt-get update && sudo apt-get install -y subversion
+
     - name: Install Composer dependencies
       run: |
         rm composer.lock || true
