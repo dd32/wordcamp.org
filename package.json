@@ -23,8 +23,15 @@
 		"public_html/wp-content/themes/wporg-flagship-landing"
 	],
 	"devDependencies": {
+		"@wordpress/env": "^10.0.0",
 		"@wordpress/eslint-plugin": "24.1.0",
 		"@wordpress/jest-preset-default": "12.39.0"
+	},
+	"scripts": {
+		"wp-env:start": "wp-env start",
+		"wp-env:stop": "wp-env stop",
+		"wp-env:test:php": "wp-env run tests-cli --env-cwd=/var/www/html phpunit -c phpunit.xml.dist",
+		"wp-env:destroy": "wp-env destroy"
 	},
 	"browserslist": [
 		"extends @wordpress/browserslist-config"

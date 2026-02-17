@@ -9,6 +9,12 @@ docker-compose.override.yaml
 
 
 #
+# wp-env
+#
+.wp-env-home
+
+
+#
 # Misc
 #
 .phpunit
