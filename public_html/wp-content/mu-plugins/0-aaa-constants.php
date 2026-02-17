@@ -22,11 +22,6 @@ $defaults = array(
 	'CAMPUS_ROOT_BLOG_ID'   => 47,
 	'SITE_ID_CURRENT_SITE'  => 1,
 	'BLOG_ID_CURRENT_SITE'  => 5,
-
-	// Multisite constants needed so WordPress loads the multisite
-	// function stack (get_site_meta, etc.) during initial install.
-	'MULTISITE'             => true,
-	'SUBDOMAIN_INSTALL'     => true,
 );
 
 foreach ( $defaults as $name => $value ) {
