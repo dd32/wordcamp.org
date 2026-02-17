@@ -15,7 +15,7 @@ $coming_soon_enabled  = $coming_soon_settings['enabled'] ?? 'off';
 
 $caching_enabled = apply_filters(
 	'wordcamp_service_worker_caching_enabled',
-	'production' === WORDCAMP_ENVIRONMENT && 'off' === $coming_soon_enabled
+	defined( 'WORDCAMP_ENVIRONMENT' ) && 'production' === WORDCAMP_ENVIRONMENT && 'off' === $coming_soon_enabled
 );
 
 if ( ! $caching_enabled ) {

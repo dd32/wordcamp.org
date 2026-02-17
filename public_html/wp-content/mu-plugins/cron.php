@@ -19,7 +19,7 @@ if ( wp_doing_cron() ) {
 	wp_raise_memory_limit( 'wordcamp_high' );
 }
 
-if ( 'production' === WORDCAMP_ENVIRONMENT && is_main_site() ) {
+if ( defined( 'WORDCAMP_ENVIRONMENT' ) && 'production' === WORDCAMP_ENVIRONMENT && is_main_site() ) {
 	add_action( 'init',                __NAMESPACE__ . '\schedule_daily_jobs' );
 	add_action( 'wordcamp_daily_jobs', __NAMESPACE__ . '\execute_daily_jobs' );
 }
