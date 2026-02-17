@@ -95,8 +95,6 @@
 		"yoast/phpunit-polyfills": "^4.0",
 		"composer/installers": "^2.2",
 		"wordpress-plugin/bbpress": "2.6.*",
-		"wpackagist-plugin/supportflow": "dev-trunk",
-		"wpackagist-plugin/tagregator": "dev-trunk",
 		"wordpress-meta/wporg-profiles-wp-activity-notifier": "1.1",
 		"wporg/wporg-mu-plugins": "dev-build",
 		"quickbooks/v3-php-sdk": "*"
