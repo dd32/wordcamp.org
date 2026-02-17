@@ -31,7 +31,6 @@
 		"IS_WORDCAMP_NETWORK": true,
 		"WP_ENVIRONMENT_TYPE": "local",
 		"SUNRISE": true,
-		"SUBDOMAIN_INSTALL": true,
 		"DOMAIN_CURRENT_SITE": "wordcamp.test",
 		"PATH_CURRENT_SITE": "/",
 		"SITE_ID_CURRENT_SITE": 1,
@@ -71,10 +70,14 @@
 		"afterStart": "node .wp-env/setup.mjs"
 	},
 	"env": {
+		"development": {
+			"config": {
+				"SUBDOMAIN_INSTALL": true
+			}
+		},
 		"tests": {
 			"config": {
 				"WP_TESTS_MULTISITE": 1,
-				"SUBDOMAIN_INSTALL": false,
 				"DOMAIN_CURRENT_SITE": "localhost",
 				"BLOG_ID_CURRENT_SITE": 1,
 				"WORDCAMP_ROOT_BLOG_ID": 1
