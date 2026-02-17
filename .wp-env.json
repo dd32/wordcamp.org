@@ -73,7 +73,10 @@
 	"env": {
 		"tests": {
 			"config": {
-				"WP_TESTS_MULTISITE": 1
+				"WP_TESTS_MULTISITE": 1,
+				"DOMAIN_CURRENT_SITE": "localhost",
+				"BLOG_ID_CURRENT_SITE": 1,
+				"WORDCAMP_ROOT_BLOG_ID": 1
 			},
 			"mappings": {
 				"wp-content/mu-plugins": "./public_html/wp-content/mu-plugins",
