@@ -90,7 +90,7 @@ jobs:
       run: echo '{ "phpVersion":"${{ matrix.php-version }}" }' > .wp-env.override.json
 
     - name: Start wp-env
-      run: npx wp-env start || (sleep 30 && npx wp-env start)
+      run: npx wp-env start || (npx wp-env destroy --yes && sleep 10 && npx wp-env start)
 
     - name: Running unit tests
       run: npx wp-env run tests-cli --env-cwd=/var/www/html /var/www/html/vendor/bin/phpunit -c phpunit.xml.dist
