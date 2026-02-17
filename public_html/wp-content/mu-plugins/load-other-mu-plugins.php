@@ -2,6 +2,10 @@
 
 defined( 'WPINC' ) || die();
 
+if ( wp_installing() ) {
+	return;
+}
+
 wcorg_include_common_plugins();
 wcorg_include_network_only_plugins();
 
