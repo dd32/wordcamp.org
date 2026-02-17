@@ -7,6 +7,10 @@ use WordCamp\Logger;
 
 defined( 'WPINC' ) || die();
 
+if ( wp_installing() ) {
+	return;
+}
+
 // Load the Jetpack Custom CSS Module that was removed in Jetpack 13.8.
 include_once __DIR__ . '/module-custom-css/custom-css.php';
 
