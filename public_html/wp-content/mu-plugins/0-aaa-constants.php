@@ -3,10 +3,10 @@
  * Define fallback constants for environments where wp-config.php
  * hasn't yet defined them.
  *
- * wp-env runs `wp core install` before `wp config set`, so custom
- * constants aren't available when mu-plugins first load during
- * installation. This file provides safe defaults so the mu-plugins
- * don't cause fatal errors during that initial bootstrap.
+ * Some environments run `wp core install` before setting custom
+ * constants, so they aren't available when mu-plugins first load
+ * during installation. This file provides safe defaults so the
+ * mu-plugins don't cause fatal errors during that initial bootstrap.
  *
  * In production and Docker environments, all constants are already
  * defined in wp-config.php, so this file is a no-op.

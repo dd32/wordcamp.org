@@ -221,7 +221,7 @@ define( 'WP_CACHE_DEBUG_USERNAME', '' );
  * Bootstrap WordPress
  */
 if ( ! defined('ABSPATH') ) {
-	define( 'ABSPATH', dirname( __FILE__ ) . '/mu/' );
+	define( 'ABSPATH', __DIR__ . '/mu/' );
 }
 
 require_once ABSPATH . 'wp-settings.php';
