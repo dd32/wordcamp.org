@@ -18,10 +18,7 @@ function wcorg_include_common_plugins() {
 
 	// Include the public `wporg-mu-plugins` that are synced from Git to SVN. These are different than the
 	// ones included in `wcorg_include_common_plugins()`.
-	$pub_sync_loader = dirname( __DIR__ ) . '/mu-plugins-private/wporg-mu-plugins/pub-sync/loader.php';
-	if ( file_exists( $pub_sync_loader ) ) {
-		require_once $pub_sync_loader;
-	}
+	require_once dirname( __DIR__ ) . '/mu-plugins-private/wporg-mu-plugins/pub-sync/loader.php';
 
 	wcorg_include_individual_mu_plugins();
 	wcorg_include_mu_plugin_folders();
@@ -31,7 +28,7 @@ function wcorg_include_common_plugins() {
  * Include mu-plugins that should only run on a specific network.
  */
 function wcorg_include_network_only_plugins() {
-	if ( defined( 'EVENTS_NETWORK_ID' ) && defined( 'SITE_ID_CURRENT_SITE' ) && EVENTS_NETWORK_ID === SITE_ID_CURRENT_SITE ) {
+	if ( EVENTS_NETWORK_ID === SITE_ID_CURRENT_SITE ) {
 		$network_folder = 'events';
 
 	} else {

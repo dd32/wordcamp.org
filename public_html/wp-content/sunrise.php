@@ -134,9 +134,17 @@ function get_domain_network_id( string $domain ): int {
 	}
 }
 
-// During wp-env initial install, constants aren't yet in wp-config.php.
-// Return early to avoid fatal errors; sunrise will work on subsequent loads.
+// During wp-env setup, WORDCAMP_ENVIRONMENT is set last in wp-config.php so
+// all other constants are available first. Define a safe default and return
+// early until setup is complete. Sunrise loads before mu-plugins, so this
+// constant is available everywhere.
 if ( ! defined( 'WORDCAMP_ENVIRONMENT' ) ) {
+	define( 'WORDCAMP_ENVIRONMENT', 'local' );
+
+	// Prevent plugins from loading during initial setup.
+	add_filter( 'option_active_plugins', '__return_empty_array' );
+	add_filter( 'site_option_active_sitewide_plugins', '__return_empty_array' );
+
 	return;
 }
 
