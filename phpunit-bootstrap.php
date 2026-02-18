@@ -4,23 +4,34 @@
 $is_wp_env = str_starts_with( __DIR__, '/var/www/html' );
 
 // Require composer dependencies.
+// In wp-env, use the mu-plugins vendor path directly to avoid double-loading
+// (the vendor/ mapping and mu-plugins/vendor/ are the same Docker mount).
 $vendor_autoload = $is_wp_env
-	? '/var/www/html/vendor/autoload.php'
+	? '/var/www/html/wp-content/mu-plugins/vendor/autoload.php'
 	: __DIR__ . '/vendor/autoload.php';
 
 if ( file_exists( $vendor_autoload ) ) {
 	require_once $vendor_autoload;
 }
 
-const WORDCAMP_ENVIRONMENT  = 'local';
-const WORDCAMP_NETWORK_ID   = 1;
-const WORDCAMP_ROOT_BLOG_ID = 5;
-const EVENTS_NETWORK_ID     = 2;
-const EVENTS_ROOT_BLOG_ID   = 47;
-const CAMPUS_NETWORK_ID     = 3;
-const CAMPUS_ROOT_BLOG_ID   = 47;
-const SITE_ID_CURRENT_SITE  = WORDCAMP_NETWORK_ID;
-const BLOG_ID_CURRENT_SITE  = WORDCAMP_ROOT_BLOG_ID;
+// Define constants only if not already set (wp-env sets these via wp-config.php).
+$bootstrap_constants = array(
+	'WORDCAMP_ENVIRONMENT'  => 'local',
+	'WORDCAMP_NETWORK_ID'   => 1,
+	'WORDCAMP_ROOT_BLOG_ID' => 5,
+	'EVENTS_NETWORK_ID'     => 2,
+	'EVENTS_ROOT_BLOG_ID'   => 47,
+	'CAMPUS_NETWORK_ID'     => 3,
+	'CAMPUS_ROOT_BLOG_ID'   => 47,
+	'SITE_ID_CURRENT_SITE'  => 1,
+	'BLOG_ID_CURRENT_SITE'  => 5,
+);
+
+foreach ( $bootstrap_constants as $name => $value ) {
+	if ( ! defined( $name ) ) {
+		define( $name, $value );
+	}
+}
 
 if ( $is_wp_env ) {
 	define( 'WP_PLUGIN_DIR', '/var/www/html/wp-content/plugins' );
