@@ -2,7 +2,7 @@
 
 defined( 'WPINC' ) || die();
 
-if ( wp_installing() ) {
+if ( wp_installing() || ! is_multisite() ) {
 	return;
 }
 
