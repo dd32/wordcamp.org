@@ -87,7 +87,10 @@ const PATTERN_CITY_PATH = '
  * Load the sunrise file for the current network.
  */
 function load_network_sunrise() {
-	switch ( SITE_ID_CURRENT_SITE ) {
+	$host       = strtolower( strtok( $_SERVER['HTTP_HOST'] ?? '', ':' ) );
+	$network_id = get_domain_network_id( $host );
+
+	switch ( $network_id ) {
 		case CAMPUS_NETWORK_ID:
 			// Intentional Fall through. Load Events plugins for now.
 		case EVENTS_NETWORK_ID:
@@ -129,6 +132,13 @@ function get_domain_network_id( string $domain ): int {
 		default:
 			return WORDCAMP_NETWORK_ID;
 	}
+}
+
+// During wp-env setup, WORDCAMP_ENVIRONMENT is set last in wp-config.php
+// so all other constants are available first. Return early until it's set.
+if ( ! defined( 'WORDCAMP_ENVIRONMENT' ) ) {
+	define( 'WORDCAMP_ENVIRONMENT', 'local' );
+	return;
 }
 
 load_network_sunrise();

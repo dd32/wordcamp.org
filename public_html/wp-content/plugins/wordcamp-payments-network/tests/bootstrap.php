@@ -10,7 +10,10 @@ if ( 'cli' !== php_sapi_name() ) {
  * Load the plugins that we'll need to be active for the tests.
  */
 function manually_load_plugin() {
-	require_once SUT_WP_CONTENT_DIR . '/mu-plugins-private/wporg-mu-plugins/pub-sync/utilities/class-export-csv.php';
+	$export_csv = SUT_WP_CONTENT_DIR . '/mu-plugins-private/wporg-mu-plugins/pub-sync/utilities/class-export-csv.php';
+	if ( file_exists( $export_csv ) ) {
+		require_once $export_csv;
+	}
 
 	require_once WP_PLUGIN_DIR . '/wordcamp-payments/includes/wordcamp-budgets.php';
 	require_once WP_PLUGIN_DIR . '/wordcamp-payments/includes/payment-request.php';

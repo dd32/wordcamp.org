@@ -26,6 +26,8 @@ class Test_Sunrise_Events extends WP_UnitTestCase {
 	 * @dataProvider data_get_redirect_url
 	 */
 	public function test_get_redirect_url( $request_uri, $expected_url ) {
+		$_SERVER['HTTP_HOST'] = 'events.wordpress.test';
+
 		$actual_url = get_redirect_url( $request_uri );
 
 		$this->assertSame( $expected_url, $actual_url );

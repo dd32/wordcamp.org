@@ -55,17 +55,6 @@ jobs:
       matrix:
         php-version: ['8.1', '8.4', '8.5']
 
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: false
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: wcorg_test
-        ports:
-          - 3306/tcp
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
     - uses: actions/checkout@v4
 
@@ -74,26 +63,34 @@ jobs:
         sudo rm -f /var/lib/man-db/auto-update # https://github.com/actions/runner-images/issues/10977
         sudo apt-get update && sudo apt-get install -y subversion
 
-    - name: Set PHP version
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+
+    - name: Set up PHP for Composer
       uses: shivammathur/setup-php@v2
       with:
-        php-version: ${{ matrix.php-version }}
+        php-version: '8.1'
         coverage: none
         tools: composer:v2
       env:
-          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Start mysql service
-      run: sudo /etc/init.d/mysql start
+        COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install dependencies
       run: |
         rm composer.lock || true
         composer install
+        yarn
 
-    - name: Install WordPress
-      run: |
-        bash .docker/bin/install-wp-tests.sh wcorg_test root root 127.0.0.1 latest
+    - name: Build JS assets
+      run: yarn workspaces run build
+
+    - name: Configure wp-env for CI
+      run: echo '{ "phpVersion":"${{ matrix.php-version }}", "multisite":false }' > .wp-env.override.json
+
+    - name: Start wp-env
+      run: npx wp-env start || (echo y | npx wp-env destroy && sleep 10 && npx wp-env start)
 
     - name: Running unit tests
-      run: ./public_html/wp-content/mu-plugins/vendor/bin/phpunit -c phpunit.xml.dist
+      run: npx wp-env run tests-cli --env-cwd=/var/www/html /var/www/html/wp-content/mu-plugins/vendor/bin/phpunit -c phpunit.xml.dist

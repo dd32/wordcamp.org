@@ -136,8 +136,11 @@ function setup_flagship_landing_site( string $domain ): bool {
 function set_network_and_site( object $site ) {
 	global $current_site, $current_blog, $blog_id, $site_id, $domain, $path, $public;
 
+	$host       = strtolower( strtok( $_SERVER['HTTP_HOST'] ?? '', ':' ) );
+	$network_id = \WordCamp\Sunrise\get_domain_network_id( $host );
+
 	// Originally WP referred to networks as "sites" and sites as "blogs".
-	$current_site = WP_Network::get_instance( WORDCAMP_NETWORK_ID );
+	$current_site = WP_Network::get_instance( $network_id );
 	$site_id      = $current_site->id;
 	$path         = stripslashes( $_SERVER['REQUEST_URI'] );
 	$current_blog = WP_Site::get_instance( $site->blog_id );
