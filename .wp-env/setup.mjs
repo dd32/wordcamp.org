@@ -34,8 +34,14 @@ function sql( sql ) {
 	return wp( `db query "${ sql.replace( /"/g, '\\"' ) }"` );
 }
 
-// Check if setup has already run by counting sites.
-const siteCount = parseInt( wp( 'site list --format=count' ), 10 );
+// Check if multisite is available and if setup has already run.
+let siteCount;
+try {
+	siteCount = parseInt( wp( 'site list --format=count' ), 10 );
+} catch {
+	console.log( 'Multisite is not available. Skipping setup.' );
+	process.exit( 0 );
+}
 
 if ( siteCount > 2 ) {
 	console.log( `Setup already complete (${ siteCount } sites exist). Skipping.` );
