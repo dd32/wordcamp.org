@@ -14,26 +14,37 @@ if ( file_exists( $vendor_autoload ) ) {
 	require_once $vendor_autoload;
 }
 
-// Define constants only if not already set (wp-env sets these via wp-config.php).
-$bootstrap_constants = array(
-	'WORDCAMP_ENVIRONMENT'  => 'local',
-	'WORDCAMP_NETWORK_ID'   => 1,
-	'WORDCAMP_ROOT_BLOG_ID' => 5,
-	'EVENTS_NETWORK_ID'     => 2,
-	'EVENTS_ROOT_BLOG_ID'   => 47,
-	'CAMPUS_NETWORK_ID'     => 3,
-	'CAMPUS_ROOT_BLOG_ID'   => 47,
-	'SITE_ID_CURRENT_SITE'  => 1,
-	'BLOG_ID_CURRENT_SITE'  => 5,
-);
+// Define constants only if not already set.
+// In wp-env, these come from wp-config.php (loaded later via wp-tests-config.php).
+// Defining them here would override the wp-env values with wrong defaults.
+if ( ! $is_wp_env ) {
+	$bootstrap_constants = array(
+		'WORDCAMP_ENVIRONMENT'  => 'local',
+		'WORDCAMP_NETWORK_ID'   => 1,
+		'WORDCAMP_ROOT_BLOG_ID' => 5,
+		'EVENTS_NETWORK_ID'     => 2,
+		'EVENTS_ROOT_BLOG_ID'   => 47,
+		'CAMPUS_NETWORK_ID'     => 3,
+		'CAMPUS_ROOT_BLOG_ID'   => 47,
+		'SITE_ID_CURRENT_SITE'  => 1,
+		'BLOG_ID_CURRENT_SITE'  => 5,
+	);
 
-foreach ( $bootstrap_constants as $name => $value ) {
-	if ( ! defined( $name ) ) {
-		define( $name, $value );
+	foreach ( $bootstrap_constants as $name => $value ) {
+		if ( ! defined( $name ) ) {
+			define( $name, $value );
+		}
 	}
 }
 
 if ( $is_wp_env ) {
+	// Override wp-env defaults for the test domain.
+	// wp-env appends the tests port to WP_TESTS_DOMAIN (e.g. 'localhost:8889'),
+	// which causes the default test site to have an invalid domain.
+	define( 'WP_TESTS_DOMAIN', 'example.org' );
+	define( 'WP_SITEURL', 'http://example.org' );
+	define( 'WP_HOME', 'http://example.org' );
+
 	define( 'WP_PLUGIN_DIR', '/var/www/html/wp-content/plugins' );
 	define( 'SUT_WP_CONTENT_DIR', '/var/www/html/wp-content/' );
 } else {

@@ -51,7 +51,9 @@ class Test_SubRoles extends Database_TestCase {
 		) );
 
 		$user->add_cap( 'wordcamp_wrangle_wordcamps' );
-		$usermeta = get_user_meta( $user->ID, 'wptests_capabilities', true );
+
+		global $wpdb;
+		$usermeta = get_user_meta( $user->ID, $wpdb->get_blog_prefix() . 'capabilities', true );
 
 		$this->assertTrue( $user->has_cap( 'read' ) );
 		$this->assertTrue( $usermeta['wordcamp_wrangle_wordcamps'] );

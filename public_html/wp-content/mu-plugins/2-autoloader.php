@@ -23,11 +23,15 @@ function autoload( $class_name ) {
 			$file_name = str_replace( 'WordPressdotorg\MU_Plugins\Utilities\\', '', $class_name );
 			$file_name = str_replace( '_', '-', strtolower( $file_name ) );
 
-			require_once( sprintf(
+			$file_path = sprintf(
 				'%s/mu-plugins-private/wporg-mu-plugins/pub-sync/utilities/class-%s.php',
 				WP_CONTENT_DIR,
 				$file_name
-			) );
+			);
+
+			if ( file_exists( $file_path ) ) {
+				require_once( $file_path );
+			}
 			break;
 	}
 }
