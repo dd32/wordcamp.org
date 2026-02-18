@@ -86,8 +86,8 @@ jobs:
     - name: Build JS assets
       run: yarn workspaces run build
 
-    - name: Configure wp-env PHP version
-      run: echo '{ "phpVersion":"${{ matrix.php-version }}" }' > .wp-env.override.json
+    - name: Configure wp-env for CI
+      run: echo '{ "phpVersion":"${{ matrix.php-version }}", "env":{ "development":{ "multisite":false } } }' > .wp-env.override.json
 
     - name: Start wp-env
       run: npx wp-env start || (npx wp-env destroy --yes && sleep 10 && npx wp-env start)
