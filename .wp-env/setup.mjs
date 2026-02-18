@@ -51,6 +51,31 @@ if ( siteCount > 2 ) {
 console.log( 'Setting up WordCamp.org multi-network environment...' );
 
 // ──────────────────────────────────────────────
+// 0. Set multisite constants that can't be in
+//    .wp-env.json because defined(SUNRISE) and
+//    defined(SUBDOMAIN_INSTALL) make WordPress's
+//    is_multisite() return true even without
+//    MULTISITE defined, breaking non-multisite envs.
+// ──────────────────────────────────────────────
+
+console.log( 'Setting multisite constants...' );
+const constants = {
+	SUNRISE: 'true',
+	SUBDOMAIN_INSTALL: 'true',
+	DOMAIN_CURRENT_SITE: "'wordcamp.test'",
+	PATH_CURRENT_SITE: "'/'",
+	NOBLOGREDIRECT: "'http://central.wordcamp.test'",
+};
+
+for ( const [ name, value ] of Object.entries( constants ) ) {
+	try {
+		wp( `config set ${ name } ${ value } --raw --type=constant` );
+	} catch {
+		// Constant may already exist.
+	}
+}
+
+// ──────────────────────────────────────────────
 // 1. Create additional networks via raw SQL.
 //    wp-env creates network 1 automatically.
 // ──────────────────────────────────────────────

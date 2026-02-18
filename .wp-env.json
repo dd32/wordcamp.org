@@ -30,10 +30,6 @@
 	"config": {
 		"IS_WORDCAMP_NETWORK": true,
 		"WP_ENVIRONMENT_TYPE": "local",
-		"SUNRISE": true,
-		"SUBDOMAIN_INSTALL": true,
-		"DOMAIN_CURRENT_SITE": "wordcamp.test",
-		"PATH_CURRENT_SITE": "/",
 		"SITE_ID_CURRENT_SITE": 1,
 		"BLOG_ID_CURRENT_SITE": 5,
 		"WORDCAMP_NETWORK_ID": 1,
@@ -42,7 +38,6 @@
 		"EVENTS_ROOT_BLOG_ID": 47,
 		"CAMPUS_NETWORK_ID": 3,
 		"CAMPUS_ROOT_BLOG_ID": 47,
-		"NOBLOGREDIRECT": "http://central.wordcamp.test",
 		"WP_DEBUG": true,
 		"WP_DEBUG_LOG": true,
 		"WP_DEBUG_DISPLAY": true,
