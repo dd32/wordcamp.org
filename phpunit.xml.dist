@@ -16,74 +16,74 @@
 	<testsuites>
 		<testsuite name="WordCamp MU Plugins">
 			<directory prefix="test-" suffix=".php">
-				./public_html/wp-content/mu-plugins/tests/
+				./wp-content/mu-plugins/tests/
 			</directory>
 		</testsuite>
 
 		<testsuite name="CampTix">
 			<directory prefix="test-" suffix=".php">
-				./public_html/wp-content/plugins/camptix/tests/
+				./wp-content/plugins/camptix/tests/
 			</directory>
 		</testsuite>
 
 		<testsuite name="WordCamp Organizer Reminders">
 			<directory prefix="test-" suffix=".php">
-				./public_html/wp-content/plugins/wordcamp-organizer-reminders/tests/
+				./wp-content/plugins/wordcamp-organizer-reminders/tests/
 			</directory>
 		</testsuite>
 
 		<testsuite name="WordCamp Budgets Dashboard">
 			<directory prefix="test-" suffix=".php">
-				./public_html/wp-content/plugins/wordcamp-payments-network/tests/
+				./wp-content/plugins/wordcamp-payments-network/tests/
 			</directory>
 		</testsuite>
 
 		<testsuite name="WordCamp Post Types">
 			<directory prefix="test-" suffix=".php">
-				./public_html/wp-content/plugins/wc-post-types/tests/
+				./wp-content/plugins/wc-post-types/tests/
 			</directory>
 		</testsuite>
 
 		<testsuite name="WordCamp Post Type">
 			<directory prefix="test-" suffix=".php">
-				./public_html/wp-content/plugins/wcpt/tests/
+				./wp-content/plugins/wcpt/tests/
 			</directory>
 		</testsuite>
 
 		<testsuite name="WordCamp Remote CSS">
 			<directory prefix="test-" suffix=".php">
-				./public_html/wp-content/plugins/wordcamp-remote-css/tests/
+				./wp-content/plugins/wordcamp-remote-css/tests/
 			</directory>
 		</testsuite>
 
 		<testsuite name="WordCamp Speaker Feedback">
 			<directory prefix="test-" suffix=".php">
-				./public_html/wp-content/plugins/wordcamp-speaker-feedback/tests/
+				./wp-content/plugins/wordcamp-speaker-feedback/tests/
 			</directory>
 		</testsuite>
 	</testsuites>
 
 	<coverage cacheDirectory=".phpunit/coverage-cache">
 		<include>
-			<directory suffix=".php">./public_html/wp-content/mu-plugins</directory>
-			<directory suffix=".php">./public_html/wp-content/plugins/camptix</directory>
-			<directory suffix=".php">./public_html/wp-content/plugins/wc-post-types</directory>
-			<directory suffix=".php">./public_html/wp-content/plugins/wcpt</directory>
-			<directory suffix=".php">./public_html/wp-content/plugins/wordcamp-organizer-reminders</directory>
-			<directory suffix=".php">./public_html/wp-content/plugins/wordcamp-payments/</directory>
-			<directory suffix=".php">./public_html/wp-content/plugins/wordcamp-payments-network/</directory>
-			<directory suffix=".php">./public_html/wp-content/plugins/wordcamp-remote-css</directory>
-			<directory suffix=".php">./public_html/wp-content/plugins/wordcamp-speaker-feedback</directory>
-			<file>./public_html/wp-content/sunrise.php</file>
-			<file>./public_html/wp-content/sunrise-events.php</file>
-			<file>./public_html/wp-content/sunrise-wordcamp.php</file>
+			<directory suffix=".php">./wp-content/mu-plugins</directory>
+			<directory suffix=".php">./wp-content/plugins/camptix</directory>
+			<directory suffix=".php">./wp-content/plugins/wc-post-types</directory>
+			<directory suffix=".php">./wp-content/plugins/wcpt</directory>
+			<directory suffix=".php">./wp-content/plugins/wordcamp-organizer-reminders</directory>
+			<directory suffix=".php">./wp-content/plugins/wordcamp-payments/</directory>
+			<directory suffix=".php">./wp-content/plugins/wordcamp-payments-network/</directory>
+			<directory suffix=".php">./wp-content/plugins/wordcamp-remote-css</directory>
+			<directory suffix=".php">./wp-content/plugins/wordcamp-speaker-feedback</directory>
+			<file>./wp-content/sunrise.php</file>
+			<file>./wp-content/sunrise-events.php</file>
+			<file>./wp-content/sunrise-wordcamp.php</file>
 		</include>
 
 		<exclude>
-			<directory>./public_html/wp-content/mu-plugins/tests</directory>
-			<directory>./public_html/wp-content/mu-plugins/vendor</directory>
-			<directory>./public_html/wp-content/plugins/*/tests</directory>
-			<directory>./public_html/wp-content/plugins/*/node_modules</directory>
+			<directory>./wp-content/mu-plugins/tests</directory>
+			<directory>./wp-content/mu-plugins/vendor</directory>
+			<directory>./wp-content/plugins/*/tests</directory>
+			<directory>./wp-content/plugins/*/node_modules</directory>
 		</exclude>
 	</coverage>
 </phpunit>
