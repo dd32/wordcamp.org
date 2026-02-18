@@ -81,8 +81,7 @@
 				"wp-content/sunrise-events.php": "./public_html/wp-content/sunrise-events.php",
 				"phpunit.xml.dist": "./phpunit.xml.dist",
 				"phpunit-bootstrap.php": "./phpunit-bootstrap.php",
-				"phpunit-database-testcase.php": "./phpunit-database-testcase.php",
-				"vendor": "./public_html/wp-content/mu-plugins/vendor"
+				"phpunit-database-testcase.php": "./phpunit-database-testcase.php"
 			}
 		}
 	}

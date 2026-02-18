@@ -93,4 +93,4 @@ jobs:
       run: npx wp-env start || (echo y | npx wp-env destroy && sleep 10 && npx wp-env start)
 
     - name: Running unit tests
-      run: npx wp-env run tests-cli --env-cwd=/var/www/html /var/www/html/vendor/bin/phpunit -c phpunit.xml.dist
+      run: npx wp-env run tests-cli --env-cwd=/var/www/html /var/www/html/wp-content/mu-plugins/vendor/bin/phpunit -c phpunit.xml.dist
