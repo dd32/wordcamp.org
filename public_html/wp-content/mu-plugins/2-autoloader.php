@@ -30,7 +30,7 @@ function autoload( $class_name ) {
 			);
 
 			if ( file_exists( $file_path ) ) {
-				require_once( $file_path );
+				require_once $file_path;
 			}
 			break;
 	}
