@@ -202,6 +202,11 @@ function redirect_to_site( string $domain, string $path ): void {
 		}
 	}
 
+	// Check if this URL was previously used by a site that has since been renamed.
+	if ( ! $redirect ) {
+		$redirect = get_renamed_site_url( $domain, $path );
+	}
+
 	if ( ! $redirect ) {
 		return;
 	}

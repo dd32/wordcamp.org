@@ -2,7 +2,7 @@
 
 namespace WordCamp\Sunrise\Events;
 use WP_Network, WP_Site;
-use function WordCamp\Sunrise\{ get_top_level_domain };
+use function WordCamp\Sunrise\{ get_top_level_domain, get_renamed_site_url };
 
 defined( 'WPINC' ) || die();
 use const WordCamp\Sunrise\{ PATTERN_CITY_YEAR_TYPE_PATH, PATTERN_CITY_PATH };
@@ -98,7 +98,16 @@ function set_network_and_site() {
 	}
 
 	if ( ! $current_blog ) {
-		// If the request doesn't match a site, redirect to the campus connect page.
+		// Check if this URL was previously used by a site that has since been renamed.
+		$renamed_url = get_renamed_site_url( DOMAIN_CURRENT_SITE, $path );
+
+		if ( $renamed_url ) {
+			header( 'X-Redirect-By: Events/Sunrise::set_network_and_site (renamed site)' );
+			header( 'Location: ' . $renamed_url, true, 301 );
+			exit;
+		}
+
+		// Otherwise, redirect to the campus connect page.
 		header( 'X-Redirect-By: Events/Sunrise::set_network_and_site' );
 		header( 'Location: ' . NOBLOGREDIRECT, true, 302 );
 		exit;
