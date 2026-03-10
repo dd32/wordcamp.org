@@ -590,7 +590,7 @@ function add_wcpt_cross_link( WP_Admin_Bar $wp_admin_bar ) {
 
 	$wp_admin_bar->add_node(
 		array(
-			'parent' => 'site-name',
+			'parent' => 'edit',
 			'id'     => 'wordcamp-post',
 			'title'  => __( 'WordCamp Post', 'wordcamporg' ),
 
