@@ -462,10 +462,11 @@ function get_format_type_options( array $options ): array {
 		'key' => 'format_type',
 		'action' => build_form_action_url(),
 		'options' => array(
+			''          => 'All',
 			'online'    => 'Online',
 			'in-person' => 'In Person',
 		),
-		'selected' => $selected,
+		'selected' => $count > 0 ? $selected : array( '' ),
 	);
 }
 
