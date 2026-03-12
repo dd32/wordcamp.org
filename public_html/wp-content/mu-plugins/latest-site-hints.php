@@ -168,6 +168,12 @@ function get_latest_home_url( $current_domain, $current_path ) {
 		return false;
 	}
 
+	$central_prefix = $wpdb->get_blog_prefix( WORDCAMP_ROOT_BLOG_ID );
+	$cancelled_filter = "LEFT JOIN {$central_prefix}postmeta pm ON pm.meta_key = '_site_id' AND pm.meta_value = b.blog_id
+		LEFT JOIN {$central_prefix}posts p ON p.ID = pm.post_id AND p.post_type = 'wordcamp'";
+	$cancelled_where = "AND ( p.post_status IS NULL OR p.post_status != 'wcpt-cancelled' )";
+
+	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Safe SQL fragments, not user input.
 	if ( preg_match( PATTERN_YEAR_DOT_CITY_DOMAIN_PATH, $current_domain . $current_path ) ) {
 		// Remove the year prefix.
 		$city_domain = substr(
@@ -176,22 +182,26 @@ function get_latest_home_url( $current_domain, $current_path ) {
 		);
 
 		$query = $wpdb->prepare( "
-			SELECT `domain`, `path`
-			FROM `$wpdb->blogs`
+			SELECT b.`domain`, b.`path`
+			FROM `$wpdb->blogs` b
+			{$cancelled_filter}
 			WHERE
-				`domain` LIKE %s AND
-				SUBSTR( domain, 1, 4 ) REGEXP '^-?[0-9]+$' -- exclude secondary language domains like 2013-fr.ottawa.wordcamp.org
-			ORDER BY `domain` DESC
+				b.`domain` LIKE %s AND
+				SUBSTR( b.domain, 1, 4 ) REGEXP '^-?[0-9]+$' -- exclude secondary language domains like 2013-fr.ottawa.wordcamp.org
+				{$cancelled_where}
+			ORDER BY b.`domain` DESC
 			LIMIT 1",
 			'%.' . $city_domain
 		);
 
 	} elseif ( preg_match( PATTERN_CITY_SLASH_YEAR_DOMAIN_PATH, $current_domain . $current_path ) ) {
 		$query = $wpdb->prepare( "
-			SELECT `domain`, `path`
-			FROM `$wpdb->blogs`
-			WHERE `domain` = %s
-			ORDER BY `domain`, `path` DESC
+			SELECT b.`domain`, b.`path`
+			FROM `$wpdb->blogs` b
+			{$cancelled_filter}
+			WHERE b.`domain` = %s
+				{$cancelled_where}
+			ORDER BY b.`domain`, b.`path` DESC
 			LIMIT 1",
 			$current_domain
 		);
@@ -202,12 +212,14 @@ function get_latest_home_url( $current_domain, $current_path ) {
 		$latest_path = "/$city/%%/$type/";
 
 		$query = $wpdb->prepare( "
-			SELECT `domain`, `path`
-			FROM `$wpdb->blogs`
+			SELECT b.`domain`, b.`path`
+			FROM `$wpdb->blogs` b
+			{$cancelled_filter}
 			WHERE
-				`domain` = %s AND
-				`path` LIKE %s
-			ORDER BY `path` DESC
+				b.`domain` = %s AND
+				b.`path` LIKE %s
+				{$cancelled_where}
+			ORDER BY b.`path` DESC
 			LIMIT 1",
 			$current_domain,
 			$latest_path
@@ -216,8 +228,9 @@ function get_latest_home_url( $current_domain, $current_path ) {
 	} else {
 		return false;
 	}
+	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-  $latest_site = $wpdb->get_results( $query ); // phpcs:ignore -- Prepared above.
+	$latest_site = $wpdb->get_results( $query ); // phpcs:ignore -- Prepared above.
 
 	if ( ! $latest_site ) {
 		return false;

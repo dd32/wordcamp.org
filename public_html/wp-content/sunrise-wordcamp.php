@@ -660,26 +660,35 @@ function get_canonical_year_url( $domain, $path ) {
 }
 
 /**
- * Get the latest site for a given city.
+ * Get the latest site for a given city, skipping cancelled events.
  */
 function get_latest_site( string $domain ) {
 	global $wpdb;
 
+	$central_prefix = $wpdb->get_blog_prefix( WORDCAMP_ROOT_BLOG_ID );
+
+	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Safe table prefix, not user input.
 	$latest = $wpdb->get_row( $wpdb->prepare( "
-		SELECT `blog_id`, `domain`, `path`
-		FROM $wpdb->blogs
+		SELECT b.`blog_id`, b.`domain`, b.`path`
+		FROM $wpdb->blogs b
+		LEFT JOIN {$central_prefix}postmeta pm
+			ON pm.meta_key = '_site_id' AND pm.meta_value = b.blog_id
+		LEFT JOIN {$central_prefix}posts p
+			ON p.ID = pm.post_id AND p.post_type = 'wordcamp'
 		WHERE
-  			( public AND NOT deleted ) -- Deleted sites should be skipped
-     			AND
+			( b.public AND NOT b.deleted ) -- Deleted sites should be skipped
+			AND
 			(
-   				( domain =    %s AND path != '/' ) OR -- Match city/year format.
-				( domain LIKE %s AND path  = '/' )    -- Match year.city format.
+				( b.domain =    %s AND b.path != '/' ) OR -- Match city/year format.
+				( b.domain LIKE %s AND b.path  = '/' )    -- Match year.city format.
 			)
-		ORDER BY path DESC, domain DESC
+			AND ( p.post_status IS NULL OR p.post_status != 'wcpt-cancelled' )
+		ORDER BY b.path DESC, b.domain DESC
 		LIMIT 1;",
 		$domain,
 		"%.{$domain}"
 	) );
+	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 	return $latest;
 }

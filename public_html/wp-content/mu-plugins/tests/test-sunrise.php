@@ -578,6 +578,24 @@ class Test_Sunrise extends Database_TestCase {
 				'/',
 				'https://vancouver.wordcamp.test/2020/',
 			),
+
+			/*
+			 * Cancelled events should be skipped.
+			 *
+			 * 2020.seattle is cancelled, so the latest non-cancelled is 2019.
+			 * vancouver/2021 is cancelled, so the latest non-cancelled is /2020/.
+			 */
+			'redirect year.city root should skip cancelled and return previous year' => array(
+				'seattle.wordcamp.test',
+				'/',
+				'https://2019.seattle.wordcamp.test/',
+			),
+
+			'redirect city/year root should skip cancelled and return previous year' => array(
+				'vancouver.wordcamp.test',
+				'/',
+				'https://vancouver.wordcamp.test/2020/',
+			),
 		);
 	}
 

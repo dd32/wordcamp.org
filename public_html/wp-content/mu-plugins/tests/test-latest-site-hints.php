@@ -105,6 +105,24 @@ class Test_WordCamp_SEO extends Database_TestCase {
 				'/rome/2023/training/',
 				'http://events.wordpress.test/rome/2024/training/',
 			),
+
+			/*
+			 * Cancelled events should be skipped.
+			 *
+			 * 2020.seattle is cancelled, so the latest non-cancelled is 2019.
+			 * vancouver/2021 is cancelled, so the latest non-cancelled is /2020/.
+			 */
+			'year.city should skip cancelled site and return previous year' => array(
+				'2019.seattle.wordcamp.test',
+				'/',
+				'http://2019.seattle.wordcamp.test/',
+			),
+
+			'city/year should skip cancelled site and return previous year' => array(
+				'vancouver.wordcamp.test',
+				'/2018-developers/',
+				'http://vancouver.wordcamp.test/2020/',
+			),
 		);
 	}
 }
