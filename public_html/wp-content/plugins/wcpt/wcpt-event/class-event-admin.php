@@ -405,6 +405,32 @@ abstract class Event_Admin {
 		wp_enqueue_script( 'wcpt-admin' );
 		wp_enqueue_script( 'select2' );
 
+		wp_add_inline_script(
+			'wcpt-admin',
+			"jQuery( function( $ ) {
+				$( document ).on( 'click', '.wcpt-multi-text-add', function() {
+					var group = $( this ).closest( '.wcpt-multi-text-group' );
+					var name  = group.data( 'name' );
+					var row   = $( '<span class=\"wcpt-multi-text-row\" style=\"display: flex; gap: 4px; margin-bottom: 4px;\">' +
+						'<input type=\"text\" name=\"' + name + '[]\" value=\"\" style=\"flex: 1;\" />' +
+						'<button type=\"button\" class=\"button wcpt-multi-text-remove\" title=\"Remove\">&times;</button>' +
+						'</span>' );
+					$( this ).before( row );
+					row.find( 'input' ).focus();
+				} );
+
+				$( document ).on( 'click', '.wcpt-multi-text-remove', function() {
+					var group = $( this ).closest( '.wcpt-multi-text-group' );
+					var rows  = group.find( '.wcpt-multi-text-row' );
+					if ( rows.length > 1 ) {
+						$( this ).closest( '.wcpt-multi-text-row' ).remove();
+					} else {
+						$( this ).siblings( 'input' ).val( '' );
+					}
+				} );
+			} );"
+		);
+
 	}
 
 	/**
@@ -537,6 +563,15 @@ abstract class Event_Admin {
 			}
 
 			switch ( $value ) {
+				case 'multi-text':
+					if ( isset( $values[ $key ] ) && is_array( $values[ $key ] ) ) {
+						$clean = array_values( array_filter( array_map( 'sanitize_text_field', $values[ $key ] ) ) );
+						update_post_meta( $post_id, $key, $clean );
+					} else {
+						update_post_meta( $post_id, $key, array() );
+					}
+					break;
+
 				case 'text':
 				case 'deputy_list':
 				case 'textarea':
@@ -855,6 +890,36 @@ abstract class Event_Admin {
 									value="<?php echo esc_attr( $date ); ?>"
 									<?php echo esc_attr( $readonly ); ?>
 								/>
+
+								<?php
+								break;
+							case 'multi-text':
+								$multi_values = get_post_meta( $post_id, $key, true );
+
+								if ( is_string( $multi_values ) && '' !== $multi_values ) {
+									// Backwards compat: convert old single-value string to array.
+									$multi_values = array( $multi_values );
+								} elseif ( ! is_array( $multi_values ) ) {
+									$multi_values = array( '' );
+								}
+
+								if ( empty( $multi_values ) ) {
+									$multi_values = array( '' );
+								}
+
+								?>
+
+								<span class="wcpt-multi-text-group" data-name="<?php echo esc_attr( $object_name ); ?>">
+									<?php foreach ( $multi_values as $i => $multi_value ) : ?>
+										<span class="wcpt-multi-text-row" style="display: flex; gap: 4px; margin-bottom: 4px;">
+											<input type="text" name="<?php echo esc_attr( $object_name ); ?>[]"
+												value="<?php echo esc_attr( $multi_value ); ?>"<?php echo esc_attr( $readonly ); ?>
+												style="flex: 1;" />
+											<button type="button" class="button wcpt-multi-text-remove" title="<?php esc_attr_e( 'Remove', 'wordcamporg' ); ?>">&times;</button>
+										</span>
+									<?php endforeach; ?>
+									<button type="button" class="button wcpt-multi-text-add"<?php echo esc_attr( $readonly ); ?>><?php esc_html_e( '+ Add another', 'wordcamporg' ); ?></button>
+								</span>
 
 								<?php
 								break;
