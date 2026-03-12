@@ -699,10 +699,11 @@ class CampTix_Payment_Method_Stripe extends CampTix_Payment_Method {
 
 			// Only delay timeout if the payment is still in a pending state.
 			if ( in_array( $payment_intent_status, array( 'requires_action', 'processing' ), true ) ) {
-				$camptix->log( 'Stripe payment still pending, delaying timeout.', $attendee_id, array(
+				$log_data = array(
 					'payment_intent_status' => $payment_intent_status,
 					'payment_status'        => $session['payment_status'],
-				) );
+				);
+				$camptix->log( 'Stripe payment still pending, delaying timeout.', $attendee_id, $log_data );
 
 				$this->delay_attendee_timeout( $attendee_id );
 				return;
@@ -714,9 +715,8 @@ class CampTix_Payment_Method_Stripe extends CampTix_Payment_Method {
 			$expires_at = $session['expires_at'] ?? 0;
 
 			if ( $expires_at > time() ) {
-				$camptix->log( 'Stripe session still open, delaying timeout.', $attendee_id, array(
-					'expires_at' => $expires_at,
-				) );
+				$log_data = array( 'expires_at' => $expires_at );
+				$camptix->log( 'Stripe session still open, delaying timeout.', $attendee_id, $log_data );
 
 				$this->delay_attendee_timeout( $attendee_id );
 				return;
