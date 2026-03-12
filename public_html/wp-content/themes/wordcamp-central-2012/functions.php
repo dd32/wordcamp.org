@@ -54,7 +54,7 @@ class WordCamp_Central_Theme {
 
 		// Add some new image sizes, also site shot is 205x148, minimap is 130x70
 		add_image_size( 'wccentral-thumbnail-small', 82, 37, true );
-		add_image_size( 'wccentral-thumbnail-large', 926, 160, true );
+		add_image_size( 'wccentral-thumbnail-large', 926, 418, true );
 		add_image_size( 'wccentral-thumbnail-past', 130, 60, true );
 		add_image_size( 'wccentral-thumbnail-hero', 493, 315, true );
 
