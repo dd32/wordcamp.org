@@ -216,8 +216,8 @@ class WCCSP_Customizer {
 			return $validity;
 		}
 
-		// If WordCamp is not added to schedule, field is not valid.
-		if ( 'wcpt-scheduled' !== $this->get_status() ) {
+		// If WordCamp is not added to schedule (or later), field is not valid.
+		if ( ! in_array( $this->get_status(), array( 'wcpt-scheduled', 'wcpt-closed' ), true ) ) {
 			return new WP_Error( 'wcpt-not-in-schedule', __( 'The Coming Soon page can not be turned off because WordCamp is not yet published in the schedule.' ) );
 		}
 
