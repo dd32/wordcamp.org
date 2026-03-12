@@ -53,6 +53,10 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 			add_filter( 'views_edit-wordcamp', array( $this, 'alter_views' ) );
 			add_action( 'parse_query', array( $this, 'filter_by_subtype' ) );
 
+			// Language filter on the WordCamp list table.
+			add_action( 'restrict_manage_posts', array( $this, 'add_language_filter_dropdown' ) );
+			add_action( 'parse_query', array( $this, 'filter_by_language' ) );
+
 			// Cron jobs.
 			add_action( 'plugins_loaded', array( $this, 'schedule_cron_jobs' ), 11 );
 			add_action( 'wcpt_close_wordcamps_after_event', array( $this, 'close_wordcamps_after_event' ) );
@@ -469,6 +473,7 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 						'WordCamp Hashtag'                  => 'text',
 						'Number of Anticipated Attendees'   => 'text',
 						'Actual Attendees'                  => 'number',
+						'Language'                          => 'select-locale',
 						'Multi-Event Sponsor Region'        => 'mes-dropdown',
 						'Global Sponsorship Grant Currency' => 'select-currency',
 						'Global Sponsorship Grant Amount'   => 'number',
@@ -515,6 +520,7 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 						'WordCamp Hashtag'                  => 'text',
 						'Number of Anticipated Attendees'   => 'text',
 						'Actual Attendees'                  => 'number',
+						'Language'                          => 'select-locale',
 						'Multi-Event Sponsor Region'        => 'mes-dropdown',
 						'Global Sponsorship Grant Currency' => 'select-currency',
 						'Global Sponsorship Grant Amount'   => 'number',
@@ -1610,6 +1616,113 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 			$meta_query[] = array(
 				'key'     => 'event_subtype',
 				'value'   => $type,
+				'compare' => '=',
+			);
+
+			$query->set( 'meta_query', $meta_query );
+		}
+
+		/**
+		 * Get available locale options for the Language field.
+		 *
+		 * Returns a curated list of WordPress locales commonly used for WordCamps.
+		 *
+		 * @return array Associative array of locale code => display name.
+		 */
+		public static function get_locale_options() {
+			return array(
+				'en_US' => 'English',
+				'es_ES' => 'Spanish',
+				'fr_FR' => 'French',
+				'de_DE' => 'German',
+				'it_IT' => 'Italian',
+				'pt_BR' => 'Portuguese (Brazil)',
+				'pt_PT' => 'Portuguese (Portugal)',
+				'ja'    => 'Japanese',
+				'zh_CN' => 'Chinese (Simplified)',
+				'zh_TW' => 'Chinese (Traditional)',
+				'ko_KR' => 'Korean',
+				'ar'    => 'Arabic',
+				'hi_IN' => 'Hindi',
+				'ru_RU' => 'Russian',
+				'nl_NL' => 'Dutch',
+				'sv_SE' => 'Swedish',
+				'nb_NO' => 'Norwegian',
+				'da_DK' => 'Danish',
+				'fi'    => 'Finnish',
+				'pl_PL' => 'Polish',
+				'cs_CZ' => 'Czech',
+				'hu_HU' => 'Hungarian',
+				'ro_RO' => 'Romanian',
+				'bg_BG' => 'Bulgarian',
+				'hr'    => 'Croatian',
+				'sk_SK' => 'Slovak',
+				'sl_SI' => 'Slovenian',
+				'uk'    => 'Ukrainian',
+				'el'    => 'Greek',
+				'tr_TR' => 'Turkish',
+				'he_IL' => 'Hebrew',
+				'th'    => 'Thai',
+				'vi'    => 'Vietnamese',
+				'id_ID' => 'Indonesian',
+				'ms_MY' => 'Malay',
+				'sr_RS' => 'Serbian',
+				'ca'    => 'Catalan',
+				'eu'    => 'Basque',
+				'gl_ES' => 'Galician',
+				'bn_BD' => 'Bengali',
+				'ne_NP' => 'Nepali',
+				'mr'    => 'Marathi',
+				'sw'    => 'Swahili',
+			);
+		}
+
+		/**
+		 * Add a Language filter dropdown to the WordCamp list table.
+		 *
+		 * @param string $post_type The current post type.
+		 */
+		public function add_language_filter_dropdown( $post_type ) {
+			if ( WCPT_POST_TYPE_ID !== $post_type ) {
+				return;
+			}
+
+			$locales  = self::get_locale_options();
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter for list table.
+			$selected = isset( $_GET['language'] ) ? sanitize_text_field( wp_unslash( $_GET['language'] ) ) : '';
+
+			?>
+			<select name="language" id="filter-by-language">
+				<option value=""><?php esc_html_e( 'All Languages', 'wordcamporg' ); ?></option>
+				<?php foreach ( $locales as $locale_code => $locale_name ) : ?>
+					<option value="<?php echo esc_attr( $locale_code ); ?>" <?php selected( $selected, $locale_code ); ?>>
+						<?php echo esc_html( $locale_name ); ?>
+					</option>
+				<?php endforeach; ?>
+			</select>
+			<?php
+		}
+
+		/**
+		 * Filter the WordCamp list by Language.
+		 *
+		 * @param WP_Query $query The current query.
+		 */
+		public function filter_by_language( $query ) {
+			if (
+				! $query->is_main_query() ||
+				WCPT_POST_TYPE_ID !== $query->get( 'post_type' ) ||
+				empty( $_REQUEST['language'] )
+			) {
+				return;
+			}
+
+			$language = sanitize_text_field( wp_unslash( $_REQUEST['language'] ) );
+
+			$meta_query   = $query->get( 'meta_query' ) ?: [];
+			$meta_query[] = array(
+				'key'     => 'Language',
+				'value'   => $language,
 				'compare' => '=',
 			);
 
