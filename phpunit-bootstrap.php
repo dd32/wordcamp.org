@@ -1,27 +1,67 @@
 <?php
 
+// Detect wp-env environment (runs inside /var/www/html).
+$is_wp_env = str_starts_with( __DIR__, '/var/www/html' );
+
 // Require composer dependencies.
-if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
-	require_once __DIR__ . '/vendor/autoload.php';
+// In wp-env, use the mu-plugins vendor path directly to avoid double-loading
+// (the vendor/ mapping and mu-plugins/vendor/ are the same Docker mount).
+$vendor_autoload = $is_wp_env
+	? '/var/www/html/wp-content/mu-plugins/vendor/autoload.php'
+	: __DIR__ . '/vendor/autoload.php';
+
+if ( file_exists( $vendor_autoload ) ) {
+	require_once $vendor_autoload;
 }
 
-const WORDCAMP_NETWORK_ID   = 1;
-const WORDCAMP_ROOT_BLOG_ID = 5;
-const EVENTS_NETWORK_ID     = 2;
-const EVENTS_ROOT_BLOG_ID   = 47;
-const CAMPUS_NETWORK_ID     = 3;
-const CAMPUS_ROOT_BLOG_ID   = 47;
-const SITE_ID_CURRENT_SITE  = WORDCAMP_NETWORK_ID;
-const BLOG_ID_CURRENT_SITE  = WORDCAMP_ROOT_BLOG_ID;
+// Define constants only if not already set.
+// In wp-env, these come from wp-config.php (loaded later via wp-tests-config.php).
+// Defining them here would override the wp-env values with wrong defaults.
+if ( ! $is_wp_env ) {
+	$bootstrap_constants = array(
+		'WORDCAMP_ENVIRONMENT'  => 'local',
+		'WORDCAMP_NETWORK_ID'   => 1,
+		'WORDCAMP_ROOT_BLOG_ID' => 5,
+		'EVENTS_NETWORK_ID'     => 2,
+		'EVENTS_ROOT_BLOG_ID'   => 47,
+		'CAMPUS_NETWORK_ID'     => 3,
+		'CAMPUS_ROOT_BLOG_ID'   => 47,
+		'SITE_ID_CURRENT_SITE'  => 1,
+		'BLOG_ID_CURRENT_SITE'  => 5,
+	);
 
-define( 'WP_PLUGIN_DIR', __DIR__ . '/public_html/wp-content/plugins' );
-define( 'SUT_WP_CONTENT_DIR', __DIR__ . '/public_html/wp-content/' ); // WP_CONTENT_DIR will be in `WP_TESTS_DIR`.
-define( 'SUT_WPMU_PLUGIN_DIR', SUT_WP_CONTENT_DIR . '/mu-plugins' ); // WPMU_PLUGIN_DIR will be in `WP_TESTS_DIR`.
+	foreach ( $bootstrap_constants as $name => $value ) {
+		if ( ! defined( $name ) ) {
+			define( $name, $value );
+		}
+	}
+}
+
+if ( $is_wp_env ) {
+	// Override wp-env defaults for the test domain.
+	// wp-env appends the tests port to WP_TESTS_DOMAIN (e.g. 'localhost:8889'),
+	// which causes the default test site to have an invalid domain.
+	define( 'WP_TESTS_DOMAIN', 'example.org' );
+	define( 'WP_SITEURL', 'http://example.org' );
+	define( 'WP_HOME', 'http://example.org' );
+
+	define( 'WP_PLUGIN_DIR', '/var/www/html/wp-content/plugins' );
+	define( 'SUT_WP_CONTENT_DIR', '/var/www/html/wp-content/' );
+} else {
+	define( 'WP_PLUGIN_DIR', __DIR__ . '/public_html/wp-content/plugins' );
+	define( 'SUT_WP_CONTENT_DIR', __DIR__ . '/public_html/wp-content/' ); // WP_CONTENT_DIR will be in `WP_TESTS_DIR`.
+}
+define( 'SUT_WPMU_PLUGIN_DIR', SUT_WP_CONTENT_DIR . 'mu-plugins' ); // WPMU_PLUGIN_DIR will be in `WP_TESTS_DIR`.
 
 $core_tests_directory = getenv( 'WP_TESTS_DIR' );
 
 if ( ! $core_tests_directory ) {
-	$core_tests_directory = rtrim( sys_get_temp_dir(), '/\\' ) . '/wp/wordpress-tests-lib';
+	if ( $is_wp_env && is_dir( '/wordpress-phpunit' ) ) {
+		$core_tests_directory = '/wordpress-phpunit';
+	} else {
+		$core_tests_directory = rtrim( sys_get_temp_dir(), '/\\' ) . '/wp/wordpress-tests-lib';
+	}
+
 	// Necessary for the CampTix tests.
 	putenv( "WP_TESTS_DIR=$core_tests_directory" );
 }

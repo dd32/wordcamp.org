@@ -57,6 +57,10 @@ add_filter( 'close_comments_for_post_types', 'wcorg_close_comments_for_post_type
  * @return string
  */
 function wcorg_enforce_public_blog_option() {
+	if ( wp_installing() || ! is_multisite() ) {
+		return '1';
+	}
+
 	if ( is_wordcamp_test_site() ) {
 		$value = '0';
 	} else {
