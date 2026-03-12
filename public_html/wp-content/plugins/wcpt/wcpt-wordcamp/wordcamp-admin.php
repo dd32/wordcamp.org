@@ -1151,6 +1151,11 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 				'Budget Wrangler E-mail Address',
 			);
 
+			// Venue Contact Information is required for Campus Connect events.
+			if ( 'campusconnect' === get_post_meta( $post_id, 'event_subtype', true ) ) {
+				$scheduled[] = 'Contact Information';
+			}
+
 			// Required because the Events Widget needs a physical address in order to show events.
 			$scheduled[] = self::get_address_key( $post_id );
 
@@ -1701,5 +1706,10 @@ function wcpt_metabox( $meta_keys, $metabox ) {
 		$messages['Host region']      = $address_instructions;
 	}
 
-	Event_Admin::display_meta_boxes( $required_fields, $meta_keys, $messages, $post_id, WordCamp_Admin::get_protected_fields() );
+	// Override display labels for specific meta keys.
+	$labels = array(
+		'Contact Information' => 'Contact Email Address',
+	);
+
+	Event_Admin::display_meta_boxes( $required_fields, $meta_keys, $messages, $post_id, WordCamp_Admin::get_protected_fields(), $labels );
 }
