@@ -19,6 +19,9 @@ class Test_Meetup_Admin_Columns extends WP_UnitTestCase {
 	 */
 	private static $meetup_admin;
 
+	/**
+	 * Set up the Meetup_Admin instance before running tests.
+	 */
 	public static function set_up_before_class() {
 		parent::set_up_before_class();
 		self::$meetup_admin = new Meetup_Admin();
