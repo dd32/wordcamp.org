@@ -18,9 +18,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class WordCamp_Forms_To_Drafts {
 	/**
+	 * @var \WordCamp\Utilities\Form_Spam_Prevention
+	 */
+	protected $spam_prevention;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
+		$this->spam_prevention = new \WordCamp\Utilities\Form_Spam_Prevention( array(
+			'score_threshold'   => 4,
+			'throttle_duration' => HOUR_IN_SECONDS,
+			'prefix'            => 'wcfd-',
+		) );
 		add_action( 'wp_print_styles',                    array( $this, 'print_front_end_styles' ) );
 		add_action( 'wp_enqueue_scripts',                 array( $this, 'enqueue_inert_script' ) );
 		add_filter( 'the_content',                        array( $this, 'force_login_to_use_form' ), 8 );
@@ -234,8 +244,8 @@ class WordCamp_Forms_To_Drafts {
 	 * Rate limit form submissions for non-logged-in users.
 	 *
 	 * Pentesters and bots can spam forms with thousands of submissions, creating
-	 * excessive draft posts. This limits non-logged-in users to a small number of
-	 * submissions per hour per IP address.
+	 * excessive draft posts. Uses the existing Form_Spam_Prevention utility to
+	 * throttle by IP address.
 	 *
 	 * @param bool|WP_Error $is_spam Whether the submission is spam.
 	 *
@@ -247,23 +257,15 @@ class WordCamp_Forms_To_Drafts {
 			return $is_spam;
 		}
 
-		$ip = $_SERVER['REMOTE_ADDR'] ?? '';
-		if ( empty( $ip ) ) {
-			return $is_spam;
-		}
-
-		$transient_key    = 'wcfd_rate_' . md5( $ip );
-		$submission_count = (int) get_transient( $transient_key );
-		$max_per_hour     = 3;
-
-		if ( $submission_count >= $max_per_hour ) {
+		if ( $this->spam_prevention->is_ip_address_throttled() ) {
 			return new WP_Error(
 				'rate_limited',
 				__( 'You have submitted too many forms recently. Please wait a while and try again, or log in to your WordPress.org account.', 'wordcamporg' )
 			);
 		}
 
-		set_transient( $transient_key, $submission_count + 1, HOUR_IN_SECONDS );
+		// Each submission adds 1 point. With a threshold of 4, this allows ~3 submissions per hour.
+		$this->spam_prevention->add_score_to_ip_address( array( 1 ) );
 
 		return $is_spam;
 	}
