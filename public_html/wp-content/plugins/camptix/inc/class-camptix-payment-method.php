@@ -230,10 +230,10 @@ abstract class CampTix_Payment_Method extends CampTix_Addon {
 		$refund_data = array();
 
 		_doing_it_wrong(
-			get_class( $this ) . '::payment_refund',
+			esc_html( get_class( $this ) ) . '::payment_refund',
 			sprintf(
 				'Payment gateway "%s" has not implemented refund support. Payment gateways should implement the payment_refund() method.',
-				$this->name
+				esc_html( $this->name )
 			),
 			'CampTix 1.7'
 		);
@@ -262,10 +262,10 @@ abstract class CampTix_Payment_Method extends CampTix_Addon {
 		);
 
 		_doing_it_wrong(
-			get_class( $this ) . '::send_refund_request',
+			esc_html( get_class( $this ) ) . '::send_refund_request',
 			sprintf(
 				'Payment gateway "%s" has not implemented refund support. Payment gateways should implement the send_refund_request() method.',
-				$this->name
+				esc_html( $this->name )
 			),
 			'CampTix 1.7'
 		);
