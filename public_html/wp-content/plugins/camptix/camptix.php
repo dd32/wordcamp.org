@@ -5358,10 +5358,6 @@ class CampTix_Plugin {
 				$coupon->tix_applies_to = (array) get_post_meta( $coupon->ID, 'tix_applies_to' );
 				$coupon->tix_bypass_max_tickets_per_order = (int) get_post_meta( $coupon->ID, 'tix_bypass_max_tickets_per_order', true );
 				$this->coupon = $coupon;
-
-				if ( $coupon->tix_bypass_max_tickets_per_order ) {
-					$max_tickets_per_order = apply_filters( 'camptix_max_tickets_per_order_after_coupon_bypass', $max_tickets_per_order * 3, $max_tickets_per_order );
-				}
 			} else {
 				$this->error_flags['invalid_coupon'] = true;
 			}
@@ -5747,11 +5743,12 @@ class CampTix_Plugin {
 
 							// Recount selects, change price.
 							if ( $ticket->tix_coupon_applied ) {
+								$ticket_max = $max_tickets_per_order;
 								if ( $this->coupon->tix_bypass_max_tickets_per_order ) {
-									$max_tickets_per_order = apply_filters( 'camptix_max_tickets_per_order_after_coupon_bypass', $max_tickets_per_order * 3, $max_tickets_per_order );
+									$ticket_max = apply_filters( 'camptix_max_tickets_per_order_after_coupon_bypass', $max_tickets_per_order * 3, $max_tickets_per_order );
 								}
 
-								$max = min( $this->coupon->tix_coupon_remaining, $ticket->tix_remaining, $max_tickets_per_order );
+								$max = min( $this->coupon->tix_coupon_remaining, $ticket->tix_remaining, $ticket_max );
 
 								if ( $selected > $this->coupon->tix_coupon_remaining )
 									$selected = $this->coupon->tix_coupon_remaining;
@@ -7589,10 +7586,6 @@ class CampTix_Plugin {
 				$coupon->tix_discount_percent = (int) get_post_meta( $coupon->ID, 'tix_discount_percent', true );
 				$coupon->tix_applies_to = (array) get_post_meta( $coupon->ID, 'tix_applies_to' );
 				$coupon->tix_bypass_max_tickets_per_order = (int) get_post_meta( $coupon->ID, 'tix_bypass_max_tickets_per_order', true );
-
-				if ( $coupon->tix_bypass_max_tickets_per_order ) {
-					$max_tickets_per_order = apply_filters( 'camptix_max_tickets_per_order_after_coupon_bypass', $max_tickets_per_order * 3, $max_tickets_per_order );
-				}
 			} else {
 				$order['coupon'] = null;
 				$coupon = null;
@@ -7668,8 +7661,13 @@ class CampTix_Plugin {
 				$this->error_flag( 'tickets_excess' );
 			}
 
-			if ( $item['quantity'] > $max_tickets_per_order ) {
-				$item['quantity'] = min( $max_tickets_per_order, $ticket->tix_remaining );
+			$item_max = $max_tickets_per_order;
+			if ( $ticket->tix_coupon_applied && $coupon && $coupon->tix_bypass_max_tickets_per_order ) {
+				$item_max = apply_filters( 'camptix_max_tickets_per_order_after_coupon_bypass', $max_tickets_per_order * 3, $max_tickets_per_order );
+			}
+
+			if ( $item['quantity'] > $item_max ) {
+				$item['quantity'] = min( $item_max, $ticket->tix_remaining );
 				$this->error_flag( 'tickets_excess' );
 			}
 
