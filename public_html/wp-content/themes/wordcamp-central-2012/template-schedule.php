@@ -66,7 +66,7 @@ get_header(); ?>
 								<li>
 									<a href="<?php echo esc_url( WordCamp_Central_Theme::get_best_wordcamp_url( $post->ID ) ); ?>">
 										<?php if ( has_post_thumbnail() ) : ?>
-											<?php the_post_thumbnail( 'wccentral-thumbnail-small', array( 'class' => 'wc-image' ) ); ?>
+											<?php the_post_thumbnail( 'wccentral-thumbnail-large', array( 'class' => 'wc-image' ) ); ?>
 										<?php else : ?>
 											<div class="wc-image wp-post-image wordcamp-placeholder-thumb" title="<?php the_title(); ?>"></div>
 										<?php endif; ?>
