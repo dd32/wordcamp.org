@@ -139,6 +139,7 @@ function get_domain_network_id( string $domain ): int {
 if ( ! defined( 'WORDCAMP_ENVIRONMENT' ) ) {
 	define( 'WORDCAMP_ENVIRONMENT', 'local' );
 	return;
+}
 
 /**
  * Look up the current URL for a site that was previously at the given domain/path.
