@@ -39,6 +39,7 @@ class Test_Lets_Encrypt extends Database_TestCase {
 			// It should contain an entry for each year.city domain that exist in the database.
 			'2018.seattle.wordcamp.test',
 			'2019.seattle.wordcamp.test',
+			'2020.seattle.wordcamp.test',
 
 			// It should contain a single entry representing all city/year domains that exist in the database.
 			'vancouver.wordcamp.test',
@@ -47,6 +48,7 @@ class Test_Lets_Encrypt extends Database_TestCase {
 			'2016.vancouver.wordcamp.test',
 			'2018-developers.vancouver.wordcamp.test',
 			'2020.vancouver.wordcamp.test',
+			'2021.vancouver.wordcamp.test',
 			'2021.japan.wordcamp.test',
 
 			// It should contain old year-less domains.
@@ -125,6 +127,7 @@ class Test_Lets_Encrypt extends Database_TestCase {
 			array(
 				'2018.seattle.wordcamp.test',
 				'2019.seattle.wordcamp.test',
+				'2020.seattle.wordcamp.test',
 			),
 			$actual['seattle.wordcamp.test']
 		);
@@ -134,6 +137,7 @@ class Test_Lets_Encrypt extends Database_TestCase {
 			array(
 				'2016.vancouver.wordcamp.test',
 				'2020.vancouver.wordcamp.test',
+				'2021.vancouver.wordcamp.test',
 				'2018-developers.vancouver.wordcamp.test',
 			),
 			$actual['vancouver.wordcamp.test']
