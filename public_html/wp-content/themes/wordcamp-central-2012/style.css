@@ -1570,6 +1570,12 @@ li:after { content: "."; display: block; height: 0; clear: both; visibility: hid
 	-webkit-box-shadow: 0px 1px 4px #75888a;
 }
 
+.wc-schedule .wc-schedule-list img.wc-image {
+	width: 82px;
+	height: 37px;
+	object-fit: cover;
+}
+
 #ie7 .wc-schedule .wc-schedule-list img,
 #ie8 .wc-schedule .wc-schedule-list img,
 #ie7 .wc-schedule .wc-schedule-list div,
