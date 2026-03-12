@@ -50,6 +50,12 @@
 			</directory>
 		</testsuite>
 
+		<testsuite name="WordCamp Forms to Drafts">
+			<directory prefix="test-" suffix=".php">
+				./public_html/wp-content/plugins/wordcamp-forms-to-drafts/tests/
+			</directory>
+		</testsuite>
+
 		<testsuite name="WordCamp Remote CSS">
 			<directory prefix="test-" suffix=".php">
 				./public_html/wp-content/plugins/wordcamp-remote-css/tests/
@@ -69,6 +75,7 @@
 			<directory suffix=".php">./public_html/wp-content/plugins/camptix</directory>
 			<directory suffix=".php">./public_html/wp-content/plugins/wc-post-types</directory>
 			<directory suffix=".php">./public_html/wp-content/plugins/wcpt</directory>
+			<directory suffix=".php">./public_html/wp-content/plugins/wordcamp-forms-to-drafts</directory>
 			<directory suffix=".php">./public_html/wp-content/plugins/wordcamp-organizer-reminders</directory>
 			<directory suffix=".php">./public_html/wp-content/plugins/wordcamp-payments/</directory>
 			<directory suffix=".php">./public_html/wp-content/plugins/wordcamp-payments-network/</directory>
