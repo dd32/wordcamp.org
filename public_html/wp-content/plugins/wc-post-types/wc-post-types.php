@@ -83,6 +83,7 @@ class WordCamp_Post_Types_Plugin {
 		add_filter( 'dashboard_glance_items', array( $this, 'glance_items' ) );
 		add_filter( 'option_default_comment_status', array( $this, 'default_comment_ping_status' ) );
 		add_filter( 'option_default_ping_status', array( $this, 'default_comment_ping_status' ) );
+		add_filter( 'get_terms', array( $this, 'order_sponsor_levels' ), 10, 4 );
 
 		// Needs to run before WordCamp\Blocks\register_assets.
 		add_action( 'init', array( $this, 'rest_init' ), 8 );
@@ -222,6 +223,50 @@ class WordCamp_Post_Types_Plugin {
 		}
 
 		return array_merge( $ordered_terms, array_values( $terms ) );
+	}
+
+	/**
+	 * Reorder wcb_sponsor_level terms based on the saved custom order.
+	 *
+	 * @param array         $terms      Array of found terms.
+	 * @param array|null    $taxonomies Array of taxonomy names.
+	 * @param array         $args       Term query args.
+	 * @param WP_Term_Query $term_query The WP_Term_Query instance.
+	 *
+	 * @return array
+	 */
+	public function order_sponsor_levels( $terms, $taxonomies, $args, $term_query ) {
+		if ( empty( $terms ) || ! is_array( $taxonomies ) || ! in_array( 'wcb_sponsor_level', $taxonomies, true ) ) {
+			return $terms;
+		}
+
+		// Only reorder when fetching solely wcb_sponsor_level terms.
+		if ( count( $taxonomies ) !== 1 ) {
+			return $terms;
+		}
+
+		$option = get_option( 'wcb_sponsor_level_order' );
+
+		if ( empty( $option ) || ! is_array( $option ) ) {
+			return $terms;
+		}
+
+		$order_map = array_flip( $option );
+
+		usort(
+			$terms,
+			function ( $a, $b ) use ( $order_map ) {
+				$a_id = is_object( $a ) ? $a->term_id : $a;
+				$b_id = is_object( $b ) ? $b->term_id : $b;
+
+				$a_pos = $order_map[ $a_id ] ?? PHP_INT_MAX;
+				$b_pos = $order_map[ $b_id ] ?? PHP_INT_MAX;
+
+				return $a_pos - $b_pos;
+			}
+		);
+
+		return $terms;
 	}
 
 	/**
