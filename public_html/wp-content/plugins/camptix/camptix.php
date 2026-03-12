@@ -7778,6 +7778,33 @@ class CampTix_Plugin {
 	}
 
 	/**
+	 * Updates a meta value for all attendees associated with a payment token.
+	 *
+	 * This is a helper to avoid duplicating the pattern of fetching attendees by
+	 * payment token and then updating meta for each one. Payment gateways often
+	 * need to store a checkout session or payment ID with all attendees in an order.
+	 *
+	 * @param string $payment_token The payment token.
+	 * @param string $meta_key      The meta key to update.
+	 * @param mixed  $meta_value    The meta value to set.
+	 *
+	 * @return bool True if attendees were found and updated, false otherwise.
+	 */
+	function update_attendees_for_payment_token( $payment_token, $meta_key, $meta_value ) {
+		$attendees = $this->get_attendees_from_payment_token( $payment_token );
+
+		if ( empty( $attendees ) ) {
+			return false;
+		}
+
+		foreach ( $attendees as $attendee ) {
+			update_post_meta( $attendee->ID, $meta_key, $meta_value );
+		}
+
+		return true;
+	}
+
+	/**
 	 * Returns a payment method class object by id/key.
 	 */
 	function get_payment_method_by_id( $id ) {
@@ -7823,6 +7850,34 @@ class CampTix_Plugin {
 	function payment_result( $payment_token, $result, $data = array(), $interactive = true ) {
 		if ( empty( $payment_token ) )
 			die( 'Do not call payment_result without a payment token.' );
+
+		// Validate that $data is properly structured for payment statuses that should include transaction data.
+		$statuses_requiring_transaction_data = array(
+			self::PAYMENT_STATUS_COMPLETED,
+			self::PAYMENT_STATUS_PENDING,
+		);
+
+		if (
+			! empty( $data ) &&
+			in_array( $result, $statuses_requiring_transaction_data, true ) &&
+			! array_key_exists( 'transaction_id', $data )
+		) {
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					'Payment data should be a structured array with "transaction_id" and "transaction_details" keys. Received keys: %s',
+					implode( ', ', array_keys( $data ) )
+				),
+				'CampTix 1.7'
+			);
+
+			$this->log(
+				sprintf( 'Payment gateway passed unstructured data to payment_result. Keys: %s', implode( ', ', array_keys( $data ) ) ),
+				0,
+				$data,
+				'payment'
+			);
+		}
 
 		$attendees = get_posts( array(
 			'posts_per_page' => -1,
