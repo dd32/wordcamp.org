@@ -108,11 +108,18 @@ class Test_Events_Query extends WP_UnitTestCase {
 	 * @covers ::inject_filters_into_search_form
 	 */
 	public function test_form_action_url_is_updated(): void {
+		$post_id = self::factory()->post->create( array(
+			'post_title'  => 'Upcoming Events',
+			'post_status' => 'publish',
+		) );
+
+		$this->go_to( get_permalink( $post_id ) );
+
 		$result = \WordPressdotorg\Events_2023\inject_filters_into_search_form( $this->sample_form );
 
 		// The action should no longer be the original example.org URL.
 		$this->assertStringNotContainsString( 'action="http://example.org/"', $result );
-		// It should contain an action attribute with a URL.
+		// It should contain an action attribute with a URL pointing to the post.
 		$this->assertMatchesRegularExpression( '/action="https?:\/\/[^"]+?"/', $result );
 	}
 
