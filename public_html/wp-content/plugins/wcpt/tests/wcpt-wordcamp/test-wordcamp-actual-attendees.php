@@ -106,6 +106,7 @@ class Test_WordCamp_Actual_Attendees extends WP_UnitTestCase {
 
 		// Set up the global post so get_post() / get_post_status() work.
 		global $post;
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional for test setup.
 		$post = get_post( $post_id );
 		setup_postdata( $post );
 
@@ -130,6 +131,7 @@ class Test_WordCamp_Actual_Attendees extends WP_UnitTestCase {
 
 		// Set up the global post so get_post() / get_post_status() work.
 		global $post;
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intentional for test setup.
 		$post = get_post( $post_id );
 		setup_postdata( $post );
 
