@@ -4,11 +4,11 @@
  * Main class to provide functionality common to all other classes
  */
 class WordCamp_Budgets {
-	const VERSION                       = '0.1.4';
-	const PAYMENT_INFO_RETENTION_PERIOD = 7; // days
+	public const VERSION                       = '0.1.4';
+	public const PAYMENT_INFO_RETENTION_PERIOD = 7; // Days.
 
-	const VIEWER_CAP = 'publish_posts';
-	const ADMIN_CAP  = 'manage_options';
+	public const VIEWER_CAP = 'publish_posts';
+	public const ADMIN_CAP  = 'manage_options';
 
 	/**
 	 * Constructor
@@ -1028,6 +1028,9 @@ class WordCamp_Budgets {
 
 		// Individual transactions.
 		foreach ( $payments as $payment ) {
+			$iban = preg_replace( '/\s/', '', $payment['iban'] );
+			$bic  = preg_replace( '/\s/', '', $payment['bic'] ?? '' );
+
 			$tx = $dom->createElement( 'CdtTrfTxInf' );
 
 			$pmt_id   = $dom->createElement( 'PmtId' );
@@ -1041,10 +1044,10 @@ class WordCamp_Budgets {
 			$amt->appendChild( $instd );
 			$tx->appendChild( $amt );
 
-			if ( ! empty( $payment['bic'] ) ) {
+			if ( ! empty( $bic ) ) {
 				$cdtr_agt     = $dom->createElement( 'CdtrAgt' );
 				$cdtr_fin_id  = $dom->createElement( 'FinInstnId' );
-				$cdtr_fin_id->appendChild( $dom->createElement( 'BIC', $payment['bic'] ) );
+				$cdtr_fin_id->appendChild( $dom->createElement( 'BIC', $bic ) );
 				$cdtr_agt->appendChild( $cdtr_fin_id );
 				$tx->appendChild( $cdtr_agt );
 			}
@@ -1055,7 +1058,7 @@ class WordCamp_Budgets {
 
 			$cdtr_acct = $dom->createElement( 'CdtrAcct' );
 			$cdtr_id   = $dom->createElement( 'Id' );
-			$cdtr_id->appendChild( $dom->createElement( 'IBAN', $payment['iban'] ) );
+			$cdtr_id->appendChild( $dom->createElement( 'IBAN', $iban ) );
 			$cdtr_acct->appendChild( $cdtr_id );
 			$tx->appendChild( $cdtr_acct );
 

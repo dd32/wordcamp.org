@@ -48,13 +48,13 @@ class CampTix_Plugin {
 	// Allow others to use this.
 	public $filter_post_meta = false;
 
-	const PAYMENT_STATUS_CANCELLED = 1;
-	const PAYMENT_STATUS_COMPLETED = 2;
-	const PAYMENT_STATUS_PENDING = 3;
-	const PAYMENT_STATUS_FAILED = 4;
-	const PAYMENT_STATUS_TIMEOUT = 5;
-	const PAYMENT_STATUS_REFUNDED = 6;
-	const PAYMENT_STATUS_REFUND_FAILED = 7;
+	public const PAYMENT_STATUS_CANCELLED = 1;
+	public const PAYMENT_STATUS_COMPLETED = 2;
+	public const PAYMENT_STATUS_PENDING = 3;
+	public const PAYMENT_STATUS_FAILED = 4;
+	public const PAYMENT_STATUS_TIMEOUT = 5;
+	public const PAYMENT_STATUS_REFUNDED = 6;
+	public const PAYMENT_STATUS_REFUND_FAILED = 7;
 
 	/**
 	 * Fired as soon as this file is loaded, don't do anything
@@ -1806,7 +1806,7 @@ class CampTix_Plugin {
 	 */
 	public function admin_notice_supported_currencies() {
 		global $pagenow;
-		$page = filter_input( INPUT_GET, 'page' );
+		$page = wp_unslash( $_GET['page'] ?? '' );
 
 		if ( 'edit.php' !== $pagenow || 'camptix_options' !== $page ) {
 			return;
@@ -5527,7 +5527,7 @@ class CampTix_Plugin {
 
 		$this->did_template_redirect = true;
 
-		$tix_action = filter_input( INPUT_GET, 'tix_action' );
+		$tix_action = sanitize_text_field( wp_unslash( $_GET['tix_action'] ?? '' ) );
 
 		if ( isset( $this->error_flags['no_payment_methods'] ) ) {
 			// Don't go past the start form if no payment methods are enabled.
@@ -6625,18 +6625,20 @@ class CampTix_Plugin {
 			die();
 		}
 
-		if ( ! $this->options['refunds_enabled'] && ! current_user_can( $this->caps['manage_attendees'] ) ) {
-			$this->error_flags['invalid_access_token'] = true;
-			$this->redirect_with_error_flags();
-			die();
-		}
+		// If the user can't manage attendees, then we'll check that refunds are enabled, and they're within the refund window.
+		if ( ! current_user_can( $this->caps['manage_attendees'] ) ) {
+			if ( ! $this->options['refunds_enabled'] ) {
+				$this->error_flags['invalid_access_token'] = true;
+				$this->redirect_with_error_flags();
+				die();
+			}
 
-		$today = date( 'Y-m-d' );
-		$refunds_until = $this->options['refunds_date_end'];
-		if ( ! strtotime( $refunds_until ) || strtotime( $refunds_until ) < strtotime( $today ) ) {
-			$this->error_flags['cannot_refund'] = true;
-			$this->redirect_with_error_flags();
-			die();
+			$refunds_until = $this->options['refunds_date_end'];
+			if ( ! strtotime( $refunds_until ) || strtotime( $refunds_until ) < time() ) {
+				$this->error_flags['cannot_refund'] = true;
+				$this->redirect_with_error_flags();
+				die();
+			}
 		}
 
 		$access_token = $_REQUEST['tix_access_token'];

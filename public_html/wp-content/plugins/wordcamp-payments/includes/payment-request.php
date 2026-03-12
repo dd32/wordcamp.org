@@ -8,7 +8,7 @@ use WordPressdotorg\MU_Plugins\Utilities;
 class WCP_Payment_Request {
 	var $meta_key_prefix = 'camppayments'; // Dirty hack so that Payment Method metabox rendering can be reused by other modules
 
-	const POST_TYPE = 'wcp_payment_request';
+	public const POST_TYPE = 'wcp_payment_request';
 
 	// @see https://core.trac.wordpress.org/ticket/19074
 	public static $transition_post_status = array();
@@ -387,9 +387,14 @@ class WCP_Payment_Request {
 	 * @param string  $name
 	 * @param bool    $required
 	 */
-	protected function render_select_input( $post, $label, $name, $required = true ) {
+	protected function render_select_input( $post, $label, $name, $required = true, $default = '' ) {
 		$selected = get_post_meta( $post->ID, '_camppayments_' . $name, true );
-		$options  = $this->get_field_value( $name, $post );
+
+		if ( empty( $selected ) && '' !== $default ) {
+			$selected = $default;
+		}
+
+		$options = $this->get_field_value( $name, $post );
 
 		require dirname( __DIR__ ) . '/views/payment-request/input-select.php';
 	}
@@ -451,7 +456,7 @@ class WCP_Payment_Request {
 	 * @param bool    $readonly
 	 * @param bool    $required
 	 */
-	protected function render_text_input( $post, $label, $name, $description = '', $variant = 'text', $row_classes = array(), $readonly = false, $required = true ) {
+	protected function render_text_input( $post, $label, $name, $description = '', $variant = 'text', $row_classes = array(), $readonly = false, $required = true, $placeholder = '' ) {
 		$value = $this->get_field_value( $name, $post );
 		array_walk( $row_classes, 'sanitize_html_class' );
 		$row_classes = implode( ' ', $row_classes );

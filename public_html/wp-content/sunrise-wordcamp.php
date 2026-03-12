@@ -205,6 +205,11 @@ function redirect_to_site( string $domain, string $path ): void {
 		}
 	}
 
+	// Check if this URL was previously used by a site that has since been renamed.
+	if ( ! $redirect ) {
+		$redirect = get_renamed_site_url( $domain, $path );
+	}
+
 	if ( ! $redirect ) {
 		return;
 	}
@@ -565,7 +570,7 @@ function get_corrected_root_relative_url( $domain, $path, $request_uri, $referer
 	 */
 	$referer_site_path = $referer_matches[4];
 
-	if ( (int) filter_var( $referer_site_path, FILTER_SANITIZE_NUMBER_INT ) >= 2021 ) {
+	if ( (int) trim( $referer_site_path, '/' ) >= 2021 ) {
 		return false;
 	}
 

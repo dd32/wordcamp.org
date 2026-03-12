@@ -43,14 +43,6 @@
 			"url": "git@github.com:WordPress/wporg-parent-2021.git"
 		},
 		{
-			"type": "composer",
-			"url": "https://wpackagist.org/",
-			"only": [
-				"wpackagist-plugin/*",
-				"wpackagist-theme/*"
-			]
-		},
-		{
 			"type": "vcs",
 			"url": "https://github.com/WordPress/wporg-mu-plugins.git"
 		},
