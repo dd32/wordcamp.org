@@ -762,18 +762,21 @@ abstract class Event_Admin {
 	 * @param array $messages List of messages to displayed by a key.
 	 * @param int   $post_id ID of post.
 	 * @param array $protected_fields List of read only fields.
+	 * @param array $labels Optional. Display labels keyed by meta key, to override the default key-as-label.
 	 */
 	public static function display_meta_boxes(
 		$required_fields,
 		$meta_keys,
 		$messages,
 		$post_id,
-		$protected_fields
+		$protected_fields,
+		$labels = array()
 	) {
 
 		foreach ( $meta_keys as $key => $value ) :
 			$object_name = wcpt_key_to_str( $key, 'wcpt_' );
 			$readonly    = in_array( $key, $protected_fields ) ? ' readonly="readonly"' : '';
+			$label       = isset( $labels[ $key ] ) ? $labels[ $key ] : $key;
 			$classes     = array(
 				'inside',
 				'wcpt-field',
@@ -788,7 +791,7 @@ abstract class Event_Admin {
 
 					<p>
 						<label>
-							<strong><?php echo esc_html( $key ); ?></strong>:
+							<strong><?php echo esc_html( $label ); ?></strong>:
 							<input
 								type="checkbox"
 								name="<?php echo esc_attr( $object_name ); ?>"
@@ -805,7 +808,7 @@ abstract class Event_Admin {
 				<?php else : ?>
 
 					<p>
-						<label for="<?php echo esc_attr( $object_name ); ?>"><?php echo esc_html( $key ); ?></label>
+						<label for="<?php echo esc_attr( $object_name ); ?>"><?php echo esc_html( $label ); ?></label>
 						<?php if ( in_array( $key, $required_fields, true ) ) : ?>
 							<span class="description"><?php esc_html_e( '(required)', 'wordcamporg' ); ?></span>
 						<?php endif; ?>
