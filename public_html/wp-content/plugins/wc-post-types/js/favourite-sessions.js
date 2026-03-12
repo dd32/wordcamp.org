@@ -20,6 +20,7 @@ jQuery( document ).ready( function ( $ ) {
 		favSessKey: 'favourite_sessions',
 		useLocalStorage: 'local_storage',
 		useUrlSessions:  'URL',
+		syncPending: false,
 
 		get: function() {
 			if ( this.primarySource == this.useLocalStorage ) {
@@ -49,6 +50,7 @@ jQuery( document ).ready( function ( $ ) {
 			}
 
 			localStorage.setItem( this.favSessKey, JSON.stringify( favSessions ) );
+			this.syncToServer();
 		},
 
 		getSessionsForLink: function() {
@@ -74,8 +76,112 @@ jQuery( document ).ready( function ( $ ) {
 			favSessions = this.favSessionsFromUrl();
 
 			localStorage.setItem( this.favSessKey, JSON.stringify( favSessions ) );
+			this.syncToServer();
 
 			return this.get();
+		},
+
+		/**
+		 * Save current favourite sessions to user meta via the REST API.
+		 *
+		 * Only runs when the user is logged in. Debounced to avoid excessive
+		 * requests when toggling multiple sessions quickly.
+		 */
+		syncToServer: function() {
+			if ( ! favSessionsPhpObject.isLoggedIn ) {
+				return;
+			}
+
+			var self = this;
+
+			// Debounce: wait 1 second after the last change before syncing.
+			if ( self.syncTimer ) {
+				clearTimeout( self.syncTimer );
+			}
+
+			self.syncTimer = setTimeout( function() {
+				var favSessions = self.get();
+				var sessionIds = Object.keys( favSessions ).map( Number );
+
+				$.ajax( {
+					method: 'POST',
+					url: favSessionsPhpObject.root + 'wc-post-types/v1/fav-sessions/',
+					data: JSON.stringify( { 'session_ids': sessionIds } ),
+					contentType: 'application/json',
+					beforeSend: function( xhr ) {
+						xhr.setRequestHeader( 'X-WP-Nonce', favSessionsPhpObject.nonce );
+					},
+				} );
+			}, 1000 );
+		},
+
+		/**
+		 * Load favourite sessions from user meta and merge with local storage.
+		 *
+		 * Server data takes precedence when local storage is empty. When both
+		 * have data, they are merged together and synced back to the server.
+		 */
+		loadFromServer: function( callback ) {
+			if ( ! favSessionsPhpObject.isLoggedIn ) {
+				callback();
+				return;
+			}
+
+			var self = this;
+
+			$.ajax( {
+				method: 'GET',
+				url: favSessionsPhpObject.root + 'wc-post-types/v1/fav-sessions/',
+				beforeSend: function( xhr ) {
+					xhr.setRequestHeader( 'X-WP-Nonce', favSessionsPhpObject.nonce );
+				},
+				success: function( response ) {
+					var serverSessionIds = response.session_ids || [];
+					var localSessions = JSON.parse( localStorage.getItem( self.favSessKey ) ) || {};
+					var localSessionIds = Object.keys( localSessions );
+					var merged = {};
+					var needsSync = false;
+					var i;
+
+					// If local storage is empty, use server data.
+					if ( localSessionIds.length === 0 && serverSessionIds.length > 0 ) {
+						for ( i = 0; i < serverSessionIds.length; i++ ) {
+							merged[ serverSessionIds[ i ] ] = true;
+						}
+						localStorage.setItem( self.favSessKey, JSON.stringify( merged ) );
+					} else if ( localSessionIds.length > 0 && serverSessionIds.length === 0 ) {
+						// Local has data but server is empty, sync local to server.
+						needsSync = true;
+					} else if ( localSessionIds.length > 0 && serverSessionIds.length > 0 ) {
+						// Both have data, merge them.
+						merged = localSessions;
+						for ( i = 0; i < serverSessionIds.length; i++ ) {
+							if ( ! merged.hasOwnProperty( serverSessionIds[ i ] ) ) {
+								merged[ serverSessionIds[ i ] ] = true;
+								needsSync = true;
+							}
+						}
+						localStorage.setItem( self.favSessKey, JSON.stringify( merged ) );
+
+						// Check if server needs sessions that only exist locally.
+						for ( i = 0; i < localSessionIds.length; i++ ) {
+							if ( serverSessionIds.indexOf( parseInt( localSessionIds[ i ] ) ) === -1 ) {
+								needsSync = true;
+							}
+						}
+					}
+
+					if ( needsSync ) {
+						self.syncToServer();
+					}
+
+					callback();
+				},
+				error: function() {
+					// If server request fails, just use local storage.
+					callback();
+				},
+			} );
 		},
 	};
 
@@ -156,6 +262,21 @@ jQuery( document ).ready( function ( $ ) {
 	}
 
 	function initFavouriteSessions() {
+		var currentUrl = window.location.href;
+
+		// If viewing a shared link, handle that immediately without waiting for server.
+		if ( currentUrl.indexOf( favSessionsUrlSlug ) > -1 ) {
+			initFromUrlOrLocalStorage();
+			return;
+		}
+
+		// Load from server first (merges with local storage), then render.
+		FavSessionsStore.loadFromServer( function() {
+			initFromUrlOrLocalStorage();
+		} );
+	}
+
+	function initFromUrlOrLocalStorage() {
 		var favSessions = FavSessionsStore.get();
 
 		if ( favSessions === {} ) {
