@@ -18,14 +18,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class WordCamp_Forms_To_Drafts {
 	/**
+	 * @var \WordCamp\Utilities\Form_Spam_Prevention
+	 */
+	protected $spam_prevention;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
+		$this->spam_prevention = new \WordCamp\Utilities\Form_Spam_Prevention( array(
+			'score_threshold'   => 4,
+			'throttle_duration' => HOUR_IN_SECONDS,
+			'prefix'            => 'wcfd-',
+		) );
 		add_action( 'wp_print_styles',                    array( $this, 'print_front_end_styles' ) );
 		add_action( 'wp_enqueue_scripts',                 array( $this, 'enqueue_inert_script' ) );
 		add_filter( 'the_content',                        array( $this, 'force_login_to_use_form' ), 8 );
 		add_action( 'template_redirect',                  array( $this, 'populate_form_based_on_user' ), 9 );
 		add_Action( 'jetpack_contact_form_is_spam',       array( $this, 'prevent_form_submission' ) );
+		add_filter( 'jetpack_contact_form_is_spam',       array( $this, 'rate_limit_submissions' ), 20 );
 		add_action( 'grunion_pre_message_sent',           array( $this, 'call_for_sponsors' ), 10, 3 );
 		add_action( 'grunion_pre_message_sent',           array( $this, 'call_for_speakers' ), 10, 3 );
 		add_action( 'grunion_pre_message_sent',           array( $this, 'call_for_volunteers' ), 10, 3 );
@@ -225,6 +236,36 @@ class WordCamp_Forms_To_Drafts {
 			// String not shown when logged out.
 			return new WP_Error( 'spam', $this->get_please_login_message( $form_id ) );
 		}
+
+		return $is_spam;
+	}
+
+	/**
+	 * Rate limit form submissions for non-logged-in users.
+	 *
+	 * Pentesters and bots can spam forms with thousands of submissions, creating
+	 * excessive draft posts. Uses the existing Form_Spam_Prevention utility to
+	 * throttle by IP address.
+	 *
+	 * @param bool|WP_Error $is_spam Whether the submission is spam.
+	 *
+	 * @return bool|WP_Error
+	 */
+	public function rate_limit_submissions( $is_spam ) {
+		// Already marked as spam, or user is logged in.
+		if ( $is_spam || is_user_logged_in() ) {
+			return $is_spam;
+		}
+
+		if ( $this->spam_prevention->is_ip_address_throttled() ) {
+			return new WP_Error(
+				'rate_limited',
+				__( 'You have submitted too many forms recently. Please wait a while and try again, or log in to your WordPress.org account.', 'wordcamporg' )
+			);
+		}
+
+		// Each submission adds 1 point. With a threshold of 4, this allows ~3 submissions per hour.
+		$this->spam_prevention->add_score_to_ip_address( array( 1 ) );
 
 		return $is_spam;
 	}
