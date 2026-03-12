@@ -24,7 +24,9 @@ function enqueue_favorite_sessions_dependencies() {
 		'favourite-sessions',
 		'favSessionsPhpObject',
 		array(
-			'root' => esc_url_raw( rest_url() ),
+			'root'         => esc_url_raw( rest_url() ),
+			'nonce'        => wp_create_nonce( 'wp_rest' ),
+			'isLoggedIn'   => is_user_logged_in(),
 			'i18n' => array(
 				'reqTimeOut'           => esc_html__( 'Sorry, the email request timed out.', 'wordcamporg' ),
 				'otherError'           => esc_html__( 'Sorry, the email request failed.',    'wordcamporg' ),
