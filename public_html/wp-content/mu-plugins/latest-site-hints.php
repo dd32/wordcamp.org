@@ -173,6 +173,7 @@ function get_latest_home_url( $current_domain, $current_path ) {
 		LEFT JOIN {$central_prefix}posts p ON p.ID = pm.post_id AND p.post_type = 'wordcamp'";
 	$cancelled_where = "AND ( p.post_status IS NULL OR p.post_status != 'wcpt-cancelled' )";
 
+	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Safe SQL fragments, not user input.
 	if ( preg_match( PATTERN_YEAR_DOT_CITY_DOMAIN_PATH, $current_domain . $current_path ) ) {
 		// Remove the year prefix.
 		$city_domain = substr(
@@ -227,6 +228,7 @@ function get_latest_home_url( $current_domain, $current_path ) {
 	} else {
 		return false;
 	}
+	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 	$latest_site = $wpdb->get_results( $query ); // phpcs:ignore -- Prepared above.
 
