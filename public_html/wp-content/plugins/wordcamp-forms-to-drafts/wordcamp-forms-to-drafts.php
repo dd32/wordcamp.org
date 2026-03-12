@@ -26,6 +26,7 @@ class WordCamp_Forms_To_Drafts {
 		add_filter( 'the_content',                        array( $this, 'force_login_to_use_form' ), 8 );
 		add_action( 'template_redirect',                  array( $this, 'populate_form_based_on_user' ), 9 );
 		add_Action( 'jetpack_contact_form_is_spam',       array( $this, 'prevent_form_submission' ) );
+		add_filter( 'jetpack_contact_form_is_spam',       array( $this, 'rate_limit_submissions' ), 20 );
 		add_action( 'grunion_pre_message_sent',           array( $this, 'call_for_sponsors' ), 10, 3 );
 		add_action( 'grunion_pre_message_sent',           array( $this, 'call_for_speakers' ), 10, 3 );
 		add_action( 'grunion_pre_message_sent',           array( $this, 'call_for_volunteers' ), 10, 3 );
@@ -225,6 +226,44 @@ class WordCamp_Forms_To_Drafts {
 			// String not shown when logged out.
 			return new WP_Error( 'spam', $this->get_please_login_message( $form_id ) );
 		}
+
+		return $is_spam;
+	}
+
+	/**
+	 * Rate limit form submissions for non-logged-in users.
+	 *
+	 * Pentesters and bots can spam forms with thousands of submissions, creating
+	 * excessive draft posts. This limits non-logged-in users to a small number of
+	 * submissions per hour per IP address.
+	 *
+	 * @param bool|WP_Error $is_spam Whether the submission is spam.
+	 *
+	 * @return bool|WP_Error
+	 */
+	public function rate_limit_submissions( $is_spam ) {
+		// Already marked as spam, or user is logged in.
+		if ( $is_spam || is_user_logged_in() ) {
+			return $is_spam;
+		}
+
+		$ip = $_SERVER['REMOTE_ADDR'] ?? '';
+		if ( empty( $ip ) ) {
+			return $is_spam;
+		}
+
+		$transient_key    = 'wcfd_rate_' . md5( $ip );
+		$submission_count = (int) get_transient( $transient_key );
+		$max_per_hour     = 3;
+
+		if ( $submission_count >= $max_per_hour ) {
+			return new WP_Error(
+				'rate_limited',
+				__( 'You have submitted too many forms recently. Please wait a while and try again, or log in to your WordPress.org account.', 'wordcamporg' )
+			);
+		}
+
+		set_transient( $transient_key, $submission_count + 1, HOUR_IN_SECONDS );
 
 		return $is_spam;
 	}
