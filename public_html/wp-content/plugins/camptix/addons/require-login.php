@@ -535,7 +535,7 @@ class CampTix_Require_Login extends CampTix_Addon {
 
 		<tr class="unknown-attendee">
 			<td colspan="2">
-				<?php $camptix->admin_setup->field_checkbox( array(
+				<?php $camptix->field_checkbox( array(
 					'name'  => $name,
 					'value' => isset( $_POST['tix_attendee_info'][ $i ]['unknown_attendee'] ),
 					'class' => 'unknown-attendee',

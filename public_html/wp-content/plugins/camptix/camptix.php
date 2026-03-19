@@ -3489,7 +3489,7 @@ class CampTix_Plugin {
 		</div>
 		<div class="misc-pub-section">
 			<span class="left"><?php _e( 'Bulk buy:', 'wordcamporg' ) ?></span>
-			<?php $this->admin_setup->field_yesno( array(
+			<?php $this->field_yesno( array(
 				'name'        => 'tix_bypass_max_tickets_per_order',
 				'value'       => $bypass_max_tickets_per_order,
 				'description' => wp_sprintf( __( 'Allow buying maximum of %s tickets instead of %s when this coupon is applied.', 'wordcamporg' ), $max_tickets_per_order_after_bypass, $max_tickets_per_order ),

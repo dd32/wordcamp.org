@@ -87,8 +87,7 @@ abstract class CampTix_Payment_Method extends CampTix_Addon {
 		global $camptix;
 
 		// Whitelist the methods we want to use to avoid unintentionally calling CampTix_Plugin methods in case of typos, etc
-		$camptix_methods = array( 'payment_result', 'redirect_with_error_flags', 'error_flag', 'get_tickets_url', 'log' );
-		$admin_setup_methods = array( 'field_text', 'field_checkbox', 'field_yesno' );
+		$camptix_methods = array( 'payment_result', 'redirect_with_error_flags', 'error_flag', 'get_tickets_url', 'log', 'field_text', 'field_checkbox', 'field_yesno' );
 
 		if ( in_array( $name, $camptix_methods ) ) {
 			// Set a default value for the log $module parameter
@@ -97,8 +96,6 @@ abstract class CampTix_Payment_Method extends CampTix_Addon {
 			}
 
 			return call_user_func_array( array( $camptix, $name ), $arguments );
-		} elseif ( in_array( $name, $admin_setup_methods ) ) {
-			return call_user_func_array( array( $camptix->admin_setup, $name ), $arguments );
 		} else {
 			trigger_error( sprintf( 'Call to undefined method %s::%s()', get_class( $this ), $name ), E_USER_ERROR );
 		}
@@ -160,7 +157,7 @@ abstract class CampTix_Payment_Method extends CampTix_Addon {
 		global $camptix;
 
 		if ( in_array( $this->camptix_options['currency'], $this->supported_currencies ) ) {
-			$camptix->admin_setup->field_yesno( $args );
+			$camptix->field_yesno( $args );
 		} else {
 			_e( 'Disabled', 'wordcamporg' );
 
