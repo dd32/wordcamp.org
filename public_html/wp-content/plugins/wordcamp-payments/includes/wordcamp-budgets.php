@@ -231,6 +231,7 @@ class WordCamp_Budgets {
 			array(
 				'uploadModalTitle'  => esc_html__( 'Attach Supporting Documentation', 'wordcamporg' ),
 				'uploadModalButton' => esc_html__( 'Attach Files', 'wordcamporg' ),
+				'fileAlreadyAttached' => esc_html__( 'That file is already attached to another request. Please upload a fresh copy of the file to this request instead.', 'wordcamporg' ),
 			)
 		);
 

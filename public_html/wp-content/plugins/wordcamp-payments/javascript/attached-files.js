@@ -82,8 +82,8 @@ jQuery( document ).ready( function( $ ) {
 		 * Sometimes users add existing files to the request, rather than uploading new ones. We need to keep track
 		 * of those so that they can be attached to the request when the form is submitted.
 		 *
-		 * Files that are already attached to other posts are ignored.
-		 * @todo add an error message if the file is already attached to other posts, see https://wordpress.slack.com/archives/meta-wordcamp/p1459185670000179
+		 * Files that are already attached to other posts are ignored, and an error is shown
+		 * prompting the user to upload a fresh copy instead.
 		 *
 		 * @param {app.AttachedFile} file
 		 */
@@ -97,7 +97,16 @@ jQuery( document ).ready( function( $ ) {
 				fileIDsToAttach = [];
 			}
 
-			if ( 0 === file.get( 'post_parent' ) && -1 === $.inArray( file.get( 'ID' ), fileIDsToAttach ) ) {
+			if ( 0 !== file.get( 'post_parent' ) && file.get( 'post_parent' ) !== parseInt( $( '#post_ID' ).val(), 10 ) ) {
+				$( '.wcb-attached-file-error' ).remove();
+				$( '.wcb_files_list' ).after(
+					$( '<div class="notice notice-error wcb-attached-file-error"><p></p></div>' )
+						.find( 'p' ).text( wcbLocalizedStrings.fileAlreadyAttached ).end()
+				);
+				return;
+			}
+
+			if ( -1 === $.inArray( file.get( 'ID' ), fileIDsToAttach ) ) {
 				fileIDsToAttach.push( file.get( 'ID' ) );
 				existingFilesToAttach.val( JSON.stringify( fileIDsToAttach ) );
 			}
