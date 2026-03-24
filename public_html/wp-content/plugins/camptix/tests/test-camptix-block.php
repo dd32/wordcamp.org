@@ -244,7 +244,7 @@ class Test_CampTix_Block extends WP_UnitTestCase {
 		$content = '[camptix]';
 		$this->assertNotFalse( stristr( $content, '[camptix' ) );
 
-		preg_match( "#\\[camptix(\s[^\\]]+)?\\]#", $content, $matches );
+		preg_match( '#\[camptix(\s[^\]]+)?\]#', $content, $matches );
 		$this->assertNotEmpty( $matches );
 		$this->assertEquals( '[camptix]', $matches[0] );
 	}
