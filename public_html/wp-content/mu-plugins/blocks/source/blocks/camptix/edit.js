@@ -9,16 +9,22 @@ import {
 	PanelBody,
 	Placeholder,
 	RangeControl,
+	SelectControl,
 	TextControl,
 	TextareaControl,
+	ToggleControl,
 } from '@wordpress/components';
 
 const blockData = window.WordCampBlocks?.camptix || {};
 
 export default function CamptixEdit( { attributes, setAttributes } ) {
-	const { ticketIds, maxTicketsPerOrder, coupon, noTicketsMessage, eventClosedMessage } = attributes;
+	const {
+		ticketIds, maxTicketsPerOrder, coupon, noTicketsMessage, eventClosedMessage,
+		showRemainingTickets, showCouponField, showSoldOut,
+	} = attributes;
 	const blockProps = useBlockProps();
 	const allTickets = blockData.tickets || [];
+	const hasCoupons = blockData.hasCoupons || false;
 
 	const displayTickets = ticketIds.length > 0
 		? allTickets.filter( ( ticket ) => ticketIds.includes( ticket.id ) )
@@ -64,6 +70,39 @@ export default function CamptixEdit( { attributes, setAttributes } ) {
 						min={ 1 }
 						max={ 10 }
 					/>
+					<ToggleControl
+						label={ __( 'Show remaining tickets', 'wordcamporg' ) }
+						checked={ showRemainingTickets }
+						onChange={ () => setAttributes( { showRemainingTickets: ! showRemainingTickets } ) }
+						help={ showRemainingTickets
+							? __( 'A "Remaining" column is shown in the ticket table.', 'wordcamporg' )
+							: __( 'The "Remaining" column is hidden.', 'wordcamporg' )
+						}
+					/>
+					<ToggleControl
+						label={ __( 'Show sold-out tickets', 'wordcamporg' ) }
+						checked={ showSoldOut }
+						onChange={ () => setAttributes( { showSoldOut: ! showSoldOut } ) }
+						help={ showSoldOut
+							? __( 'Sold-out tickets are visible with a "Sold out" label.', 'wordcamporg' )
+							: __( 'Sold-out tickets are hidden from the list.', 'wordcamporg' )
+						}
+					/>
+					<SelectControl
+						label={ __( 'Coupon field', 'wordcamporg' ) }
+						value={ showCouponField }
+						options={ [
+							{ label: __( 'Auto (show when coupons exist)', 'wordcamporg' ), value: 'auto' },
+							{ label: __( 'Always show', 'wordcamporg' ), value: 'show' },
+							{ label: __( 'Always hide', 'wordcamporg' ), value: 'hide' },
+						] }
+						onChange={ ( value ) => setAttributes( { showCouponField: value } ) }
+						help={
+							'auto' === showCouponField && ! hasCoupons
+								? __( 'No active coupons exist — the field will be hidden on the frontend.', 'wordcamporg' )
+								: undefined
+						}
+					/>
 					<TextControl
 						label={ __( 'Auto-apply coupon code', 'wordcamporg' ) }
 						value={ coupon }
@@ -99,6 +138,9 @@ export default function CamptixEdit( { attributes, setAttributes } ) {
 								<tr>
 									<th>{ __( 'Ticket', 'wordcamporg' ) }</th>
 									<th>{ __( 'Price', 'wordcamporg' ) }</th>
+									{ showRemainingTickets && (
+										<th>{ __( 'Remaining', 'wordcamporg' ) }</th>
+									) }
 									<th>{ __( 'Quantity', 'wordcamporg' ) }</th>
 								</tr>
 							</thead>
@@ -107,6 +149,9 @@ export default function CamptixEdit( { attributes, setAttributes } ) {
 									<tr key={ ticket.id }>
 										<td>{ ticket.title }</td>
 										<td>{ ticket.formattedPrice }</td>
+										{ showRemainingTickets && (
+											<td>—</td>
+										) }
 										<td>
 											<select disabled>
 												{ [ ...Array( maxTicketsPerOrder + 1 ).keys() ].map( ( i ) => (

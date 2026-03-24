@@ -74,8 +74,11 @@ function add_script_data( array $data ) {
 		);
 	}
 
+	$has_coupons = isset( $camptix ) ? $camptix->have_coupons() : false;
+
 	$data['camptix'] = array(
-		'tickets' => $tickets,
+		'tickets'    => $tickets,
+		'hasCoupons' => $has_coupons,
 	);
 
 	return $data;

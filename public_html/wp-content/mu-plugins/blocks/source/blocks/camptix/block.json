@@ -28,6 +28,19 @@
 		"eventClosedMessage": {
 			"type": "string",
 			"default": ""
+		},
+		"showRemainingTickets": {
+			"type": "boolean",
+			"default": true
+		},
+		"showCouponField": {
+			"type": "string",
+			"default": "auto",
+			"enum": [ "auto", "show", "hide" ]
+		},
+		"showSoldOut": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {

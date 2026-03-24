@@ -5441,6 +5441,25 @@ class CampTix_Plugin {
 			);
 		}
 
+		// Apply block attribute for remaining tickets visibility.
+		if ( isset( $this->block_attributes['showRemainingTickets'] ) && false === $this->block_attributes['showRemainingTickets'] ) {
+			add_filter( 'camptix_show_remaining_tickets', '__return_false' );
+		}
+
+		// Apply block attribute for coupon field visibility.
+		if ( ! empty( $this->block_attributes['showCouponField'] ) ) {
+			if ( 'hide' === $this->block_attributes['showCouponField'] ) {
+				add_filter( 'camptix_have_coupons', '__return_false' );
+			} elseif ( 'show' === $this->block_attributes['showCouponField'] ) {
+				add_filter( 'camptix_have_coupons', '__return_true' );
+			}
+		}
+
+		// Apply block attribute for sold-out ticket visibility.
+		if ( isset( $this->block_attributes['showSoldOut'] ) && true === $this->block_attributes['showSoldOut'] ) {
+			add_filter( 'camptix_hide_empty_tickets', '__return_false' );
+		}
+
 		unset( $tickets, $ticket );
 
 		// Populate selected tickets from $_POST!
@@ -7269,11 +7288,16 @@ class CampTix_Plugin {
 	 */
 	function have_coupons() {
 		$coupons = $this->get_all_coupons();
-		foreach ( $coupons as $coupon )
-			if ( $this->is_coupon_valid_for_use( $coupon->ID ) )
-				return true;
+		$has_valid = false;
 
-		return false;
+		foreach ( $coupons as $coupon ) {
+			if ( $this->is_coupon_valid_for_use( $coupon->ID ) ) {
+				$has_valid = true;
+				break;
+			}
+		}
+
+		return apply_filters( 'camptix_have_coupons', $has_valid );
 	}
 
 	/**
