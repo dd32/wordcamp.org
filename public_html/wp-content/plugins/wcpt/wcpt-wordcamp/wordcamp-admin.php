@@ -1617,7 +1617,6 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 
 			$query->set( 'meta_query', $meta_query );
 		}
-
 	}
 endif; // class_exists check.
 
