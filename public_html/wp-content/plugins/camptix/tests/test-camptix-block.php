@@ -152,9 +152,7 @@ class Test_CampTix_Block extends WP_UnitTestCase {
 		// With no tickets and block attributes set, form_start should use the custom message.
 		self::set_protected_property( 'tickets', array() );
 
-		ob_start();
-		self::$camptix->form_start();
-		$output = ob_get_clean();
+		$output = self::$camptix->form_start();
 
 		$this->assertStringContainsString( $custom_message, $output );
 	}
@@ -166,9 +164,7 @@ class Test_CampTix_Block extends WP_UnitTestCase {
 		self::$camptix->block_attributes = array();
 		self::set_protected_property( 'tickets', array() );
 
-		ob_start();
-		self::$camptix->form_start();
-		$output = ob_get_clean();
+		$output = self::$camptix->form_start();
 
 		$this->assertStringContainsString( 'Sorry, but there are currently no tickets for sale', $output );
 	}
@@ -190,9 +186,7 @@ class Test_CampTix_Block extends WP_UnitTestCase {
 			'maxTicketsPerOrder' => 3,
 		);
 
-		ob_start();
-		self::$camptix->form_start();
-		$output = ob_get_clean();
+		$output = self::$camptix->form_start();
 
 		// The quantity select should have options 0-3 (4 options), not 0-10.
 		// Count option elements for this ticket.
