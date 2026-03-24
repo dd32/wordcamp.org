@@ -115,20 +115,38 @@ class WordCamp_Budget_Tool {
 			// Submit for Approval.
 			$budget['prelim'] = $data;
 			$budget['status'] = 'pending';
-			$domain           = parse_url( home_url(), PHP_URL_HOST );
-			$link             = esc_url_raw( add_query_arg( 'page', 'wordcamp-budget', admin_url( 'admin.php' ) ) );
+			$event_name       = get_wordcamp_name();
+			$budget_link      = esc_url_raw( add_query_arg( 'page', 'wordcamp-budget', admin_url( 'admin.php' ) ) );
+			$wordcamp         = get_wordcamp_post();
+			$tracker_link     = self::_get_tracker_url( $wordcamp );
+			$sender           = $wordcamp->meta['E-mail Address'][0] ?? '';
+			$headers          = $sender ? array( 'From: ' . $sender ) : array();
 
-			$content = "A budget approval request has been submitted for {$domain} by {$user->user_login}:\n\n{$link}\n\nYours, Mr. Budget Tool";
-			wp_mail( 'support@wordcamp.org', 'Budget Approval Requested: ' . $domain, $content );
+			$content  = "A budget approval request has been submitted for {$event_name} by {$user->user_login}:\n\n";
+			$content .= "Budget page: {$budget_link}\n";
+			if ( $tracker_link ) {
+				$content .= "Tracker entry: {$tracker_link}\n";
+			}
+			$content .= "\nYours, Mr. Budget Tool";
+			wp_mail( 'support@wordcamp.org', 'Budget Approval Requested: ' . $event_name, $content, $headers );
 
 		} elseif ( 'draft' === $budget['status'] && ! empty( $_POST['wcb-budget-request-review'] ) ) {
 			// Save draft and request review.
 			$budget['prelim'] = $data;
-			$domain           = parse_url( home_url(), PHP_URL_HOST );
-			$link             = esc_url_raw( add_query_arg( 'page', 'wordcamp-budget', admin_url( 'admin.php' ) ) );
+			$event_name       = get_wordcamp_name();
+			$budget_link      = esc_url_raw( add_query_arg( 'page', 'wordcamp-budget', admin_url( 'admin.php' ) ) );
+			$wordcamp         = get_wordcamp_post();
+			$tracker_link     = self::_get_tracker_url( $wordcamp );
+			$sender           = $wordcamp->meta['E-mail Address'][0] ?? '';
+			$headers          = $sender ? array( 'From: ' . $sender ) : array();
 
-			$content = "A budget review has been requested for {$domain} by {$user->user_login}:\n\n{$link}\n\nYours, Mr. Budget Tool";
-			wp_mail( 'support@wordcamp.org', 'Budget Review Requested: ' . $domain, $content );
+			$content  = "A budget review has been requested for {$event_name} by {$user->user_login}:\n\n";
+			$content .= "Budget page: {$budget_link}\n";
+			if ( $tracker_link ) {
+				$content .= "Tracker entry: {$tracker_link}\n";
+			}
+			$content .= "\nYours, Mr. Budget Tool";
+			wp_mail( 'support@wordcamp.org', 'Budget Review Requested: ' . $event_name, $content, $headers );
 
 		} elseif ( 'pending' === $budget['status'] && current_user_can( 'wcb_approve_budget' ) ) {
 			if ( ! empty( $_POST['wcb-budget-reject'] ) ) {
@@ -250,6 +268,24 @@ class WordCamp_Budget_Tool {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Get the URL to the WordCamp tracker entry on central.wordcamp.org.
+	 */
+	private static function _get_tracker_url( $wordcamp = null ) {
+		if ( ! $wordcamp ) {
+			$wordcamp = get_wordcamp_post();
+		}
+		if ( ! $wordcamp ) {
+			return '';
+		}
+
+		return sprintf(
+			'https://central.wordcamp.%s/wp-admin/post.php?post=%d&action=edit',
+			get_top_level_domain(),
+			$wordcamp->ID
+		);
 	}
 
 	/**
