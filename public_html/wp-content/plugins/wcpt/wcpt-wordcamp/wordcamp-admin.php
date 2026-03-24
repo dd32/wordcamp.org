@@ -53,10 +53,6 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 			add_filter( 'views_edit-wordcamp', array( $this, 'alter_views' ) );
 			add_action( 'parse_query', array( $this, 'filter_by_subtype' ) );
 
-			// Language filter on the WordCamp list table.
-			add_action( 'restrict_manage_posts', array( $this, 'add_language_filter_dropdown' ) );
-			add_action( 'parse_query', array( $this, 'filter_by_language' ) );
-
 			// Cron jobs.
 			add_action( 'plugins_loaded', array( $this, 'schedule_cron_jobs' ), 11 );
 			add_action( 'wcpt_close_wordcamps_after_event', array( $this, 'close_wordcamps_after_event' ) );
@@ -1622,100 +1618,6 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 			$query->set( 'meta_query', $meta_query );
 		}
 
-		/**
-		 * Get available locale options for the Language field.
-		 *
-		 * Uses GlotPress locales if available, otherwise falls back to
-		 * wp_get_available_translations().
-		 *
-		 * @return array Associative array of locale code => display name.
-		 */
-		public static function get_locale_options() {
-			if ( defined( 'GLOTPRESS_LOCALES_PATH' ) && file_exists( GLOTPRESS_LOCALES_PATH ) ) {
-				require_once GLOTPRESS_LOCALES_PATH;
-
-				$locales = GP_Locales::locales();
-				$options = array();
-
-				foreach ( $locales as $locale ) {
-					if ( ! empty( $locale->wp_locale ) ) {
-						$options[ $locale->wp_locale ] = $locale->english_name;
-					}
-				}
-
-				asort( $options );
-
-				return $options;
-			}
-
-			// Fallback: use WordPress available translations.
-			if ( ! function_exists( 'wp_get_available_translations' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/translation-install.php';
-			}
-
-			$translations = wp_get_available_translations();
-			$options      = array( 'en_US' => 'English (United States)' );
-
-			foreach ( $translations as $locale => $data ) {
-				$options[ $locale ] = $data['english_name'];
-			}
-
-			asort( $options );
-
-			return $options;
-		}
-
-		/**
-		 * Add a Language filter dropdown to the WordCamp list table.
-		 *
-		 * @param string $post_type The current post type.
-		 */
-		public function add_language_filter_dropdown( $post_type ) {
-			if ( WCPT_POST_TYPE_ID !== $post_type ) {
-				return;
-			}
-
-			$locales  = self::get_locale_options();
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter for list table.
-			$selected = isset( $_GET['language'] ) ? sanitize_text_field( wp_unslash( $_GET['language'] ) ) : '';
-
-			?>
-			<select name="language" id="filter-by-language">
-				<option value=""><?php esc_html_e( 'All Languages', 'wordcamporg' ); ?></option>
-				<?php foreach ( $locales as $locale_code => $locale_name ) : ?>
-					<option value="<?php echo esc_attr( $locale_code ); ?>" <?php selected( $selected, $locale_code ); ?>>
-						<?php echo esc_html( $locale_name ); ?>
-					</option>
-				<?php endforeach; ?>
-			</select>
-			<?php
-		}
-
-		/**
-		 * Filter the WordCamp list by Language.
-		 *
-		 * @param WP_Query $query The current query.
-		 */
-		public function filter_by_language( $query ) {
-			if (
-				! $query->is_main_query() ||
-				WCPT_POST_TYPE_ID !== $query->get( 'post_type' ) ||
-				empty( $_REQUEST['language'] )
-			) {
-				return;
-			}
-
-			$language = sanitize_text_field( wp_unslash( $_REQUEST['language'] ) );
-
-			$meta_query   = $query->get( 'meta_query' ) ?: array();
-			$meta_query[] = array(
-				'key'     => 'Language',
-				'value'   => $language,
-				'compare' => 'LIKE',
-			);
-
-			$query->set( 'meta_query', $meta_query );
-		}
 	}
 endif; // class_exists check.
 
