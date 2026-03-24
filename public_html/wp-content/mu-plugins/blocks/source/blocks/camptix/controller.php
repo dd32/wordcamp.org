@@ -58,11 +58,19 @@ function add_script_data( array $data ) {
 		'posts_per_page' => -1,
 	) );
 
+	/** @var \CampTix_Plugin $camptix */
+	global $camptix;
+
 	foreach ( $ticket_posts as $ticket ) {
+		$price = (float) get_post_meta( $ticket->ID, 'tix_price', true );
+
 		$tickets[] = array(
-			'id'    => $ticket->ID,
-			'title' => $ticket->post_title,
-			'price' => (float) get_post_meta( $ticket->ID, 'tix_price', true ),
+			'id'             => $ticket->ID,
+			'title'          => $ticket->post_title,
+			'price'          => $price,
+			'formattedPrice' => ( 0.0 === $price )
+				? __( 'Free', 'wordcamporg' )
+				: ( isset( $camptix ) ? $camptix->append_currency( $price, false ) : (string) $price ),
 		);
 	}
 

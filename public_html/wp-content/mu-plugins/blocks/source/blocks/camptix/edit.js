@@ -15,19 +15,6 @@ import {
 
 const blockData = window.WordCampBlocks?.camptix || {};
 
-/**
- * Format a price for display.
- *
- * @param {number} price
- * @return {string} Formatted price string.
- */
-function formatPrice( price ) {
-	if ( price === 0 ) {
-		return __( 'Free', 'wordcamporg' );
-	}
-	return '$' + Number( price ).toFixed( 2 );
-}
-
 export default function CamptixEdit( { attributes, setAttributes } ) {
 	const { ticketIds, maxTicketsPerOrder, coupon, noTicketsMessage, eventClosedMessage } = attributes;
 	const blockProps = useBlockProps();
@@ -62,7 +49,7 @@ export default function CamptixEdit( { attributes, setAttributes } ) {
 						{ allTickets.map( ( ticket ) => (
 							<CheckboxControl
 								key={ ticket.id }
-								label={ `${ ticket.title } (${ formatPrice( ticket.price ) })` }
+								label={ `${ ticket.title } (${ ticket.formattedPrice })` }
 								checked={ ticketIds.includes( ticket.id ) }
 								onChange={ ( checked ) => toggleTicket( ticket.id, checked ) }
 							/>
@@ -119,7 +106,7 @@ export default function CamptixEdit( { attributes, setAttributes } ) {
 								{ displayTickets.map( ( ticket ) => (
 									<tr key={ ticket.id }>
 										<td>{ ticket.title }</td>
-										<td>{ formatPrice( ticket.price ) }</td>
+										<td>{ ticket.formattedPrice }</td>
 										<td>
 											<select disabled>
 												{ [ ...Array( maxTicketsPerOrder + 1 ).keys() ].map( ( i ) => (
