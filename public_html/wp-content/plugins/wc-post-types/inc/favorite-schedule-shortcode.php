@@ -24,8 +24,11 @@ function enqueue_favorite_sessions_dependencies() {
 		'favourite-sessions',
 		'favSessionsPhpObject',
 		array(
-			'root' => esc_url_raw( rest_url() ),
-			'i18n' => array(
+			'root'                  => esc_url_raw( rest_url() ),
+			'nonce'                 => wp_create_nonce( 'wp_rest' ),
+			'isLoggedIn'            => is_user_logged_in(),
+			'preloadedFavSessions'  => is_user_logged_in() ? WordCamp\Post_Types\REST_API\get_preloaded_fav_sessions() : false,
+			'i18n'                  => array(
 				'reqTimeOut'           => esc_html__( 'Sorry, the email request timed out.', 'wordcamporg' ),
 				'otherError'           => esc_html__( 'Sorry, the email request failed.',    'wordcamporg' ),
 				'overwriteFavSessions' => esc_html__( 'You already have some sessions saved. Would you like to overwrite those with the shared sessions that you are viewing?', 'wordcamporg' ),
