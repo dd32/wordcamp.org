@@ -34,7 +34,7 @@ export default function CamptixEdit( { attributes, setAttributes } ) {
 	const allTickets = blockData.tickets || [];
 
 	const displayTickets = ticketIds.length > 0
-		? allTickets.filter( ( t ) => ticketIds.includes( t.id ) )
+		? allTickets.filter( ( ticket ) => ticketIds.includes( ticket.id ) )
 		: allTickets;
 
 	/**
@@ -47,7 +47,7 @@ export default function CamptixEdit( { attributes, setAttributes } ) {
 		if ( checked ) {
 			setAttributes( { ticketIds: [ ...ticketIds, id ] } );
 		} else {
-			setAttributes( { ticketIds: ticketIds.filter( ( t ) => t !== id ) } );
+			setAttributes( { ticketIds: ticketIds.filter( ( ticketId ) => ticketId !== id ) } );
 		}
 	}
 
