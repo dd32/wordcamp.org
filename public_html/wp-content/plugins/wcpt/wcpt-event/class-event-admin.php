@@ -586,6 +586,21 @@ abstract class Event_Admin {
 					update_post_meta( $post_id, $key, $new_value );
 					break;
 
+				case 'select-locale':
+					$allowed_locales = array_keys( WordCamp_Admin::get_locale_options() );
+					$new_value       = array();
+
+					if ( is_array( $values[ $key ] ) ) {
+						foreach ( $values[ $key ] as $locale ) {
+							if ( in_array( $locale, $allowed_locales, true ) ) {
+								$new_value[] = $locale;
+							}
+						}
+					}
+
+					update_post_meta( $post_id, $key, $new_value );
+					break;
+
 				case 'select-streaming':
 					$allowed_values = array_keys( self::get_streaming_services() );
 					$key_other      = wcpt_key_to_str( $key, 'wcpt_' ) . '-other';
@@ -952,6 +967,33 @@ abstract class Event_Admin {
 										'show_option_none' => 'None',
 									)
 								);
+								break;
+							case 'select-locale':
+								$selected_locales = get_post_meta( $post_id, $key, true );
+								$locales          = WordCamp_Admin::get_locale_options();
+
+								if ( ! is_array( $selected_locales ) ) {
+									$selected_locales = array();
+								}
+								?>
+
+								<select
+									name="<?php echo esc_attr( $object_name ); ?>[]"
+									id="<?php echo esc_attr( $object_name ); ?>"
+									multiple
+									style="height: auto; min-height: 120px;"
+								>
+									<?php foreach ( $locales as $locale_code => $locale_name ) : ?>
+										<option
+											value="<?php echo esc_attr( $locale_code ); ?>"
+											<?php selected( in_array( $locale_code, $selected_locales, true ) ); ?>
+										>
+											<?php echo esc_html( $locale_name ); ?>
+										</option>
+									<?php endforeach; ?>
+								</select>
+
+								<?php
 								break;
 							case 'select-streaming':
 								$selected = get_post_meta( $post_id, $key, true );
