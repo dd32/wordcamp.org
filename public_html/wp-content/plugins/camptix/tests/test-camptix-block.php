@@ -42,8 +42,21 @@ class Test_CampTix_Block extends WP_UnitTestCase {
 
 		// Reset block attributes.
 		self::$camptix->block_attributes = array();
+		self::set_protected_property( 'tickets', array() );
 
 		parent::tear_down();
+	}
+
+	/**
+	 * Helper: set a protected property on the CampTix instance via reflection.
+	 *
+	 * @param string $name  Property name.
+	 * @param mixed  $value Value to set.
+	 */
+	protected static function set_protected_property( $name, $value ) {
+		$reflection = new ReflectionProperty( get_class( self::$camptix ), $name );
+		$reflection->setAccessible( true );
+		$reflection->setValue( self::$camptix, $value );
 	}
 
 	/**
@@ -137,7 +150,7 @@ class Test_CampTix_Block extends WP_UnitTestCase {
 		);
 
 		// With no tickets and block attributes set, form_start should use the custom message.
-		self::$camptix->tickets = array();
+		self::set_protected_property( 'tickets', array() );
 
 		ob_start();
 		self::$camptix->form_start();
@@ -151,7 +164,7 @@ class Test_CampTix_Block extends WP_UnitTestCase {
 	 */
 	public function test_default_no_tickets_message_when_attribute_empty() {
 		self::$camptix->block_attributes = array();
-		self::$camptix->tickets = array();
+		self::set_protected_property( 'tickets', array() );
 
 		ob_start();
 		self::$camptix->form_start();
@@ -172,7 +185,7 @@ class Test_CampTix_Block extends WP_UnitTestCase {
 		$ticket->tix_coupon_applied    = false;
 		$ticket->tix_discounted_price  = 10.00;
 
-		self::$camptix->tickets = array( $ticket_id => $ticket );
+		self::set_protected_property( 'tickets', array( $ticket_id => $ticket ) );
 		self::$camptix->block_attributes = array(
 			'maxTicketsPerOrder' => 3,
 		);
