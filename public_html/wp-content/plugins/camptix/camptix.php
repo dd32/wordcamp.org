@@ -47,6 +47,7 @@ class CampTix_Plugin {
 
 	// Allow others to use this.
 	public $filter_post_meta = false;
+	public $block_attributes = array();
 
 	public const PAYMENT_STATUS_CANCELLED = 1;
 	public const PAYMENT_STATUS_COMPLETED = 2;
@@ -5315,17 +5316,28 @@ class CampTix_Plugin {
 	function template_redirect() {
 		global $post;
 
-		if ( ! is_page() || ! $post instanceof WP_Post || ! stristr( $post->post_content, '[camptix' ) ) {
+		$has_shortcode = is_page() && $post instanceof WP_Post && stristr( $post->post_content, '[camptix' );
+		$has_block     = is_page() && $post instanceof WP_Post && stristr( $post->post_content, 'wp:wordcamp/camptix' );
+
+		if ( ! $has_shortcode && ! $has_block ) {
 			return;
 		}
 
-		// Allow [camptix attr="value"] but not [camptix_attendees] etc.
-		if ( ! preg_match( "#\\[camptix(\s[^\\]]+)?\\]#", $post->post_content, $matches ) ) {
+		if ( $has_block ) {
+			$blocks = parse_blocks( $post->post_content );
+			foreach ( $blocks as $block ) {
+				if ( 'wordcamp/camptix' === $block['blockName'] ) {
+					$this->block_attributes = $block['attrs'];
+					$this->shortcode_str = '[camptix]';
+					break;
+				}
+			}
+		} elseif ( ! preg_match( "#\\[camptix(\s[^\\]]+)?\\]#", $post->post_content, $matches ) ) {
 			return;
+		} else {
+			// Keep this in the case where we'd like to remove things around the shortcode.
+			$this->shortcode_str = $matches[0];
 		}
-
-		// Keep this in the case where we'd like to remove things around the shortcode.
-		$this->shortcode_str = $matches[0];
 
 		$this->error_flags = array();
 
@@ -5342,7 +5354,16 @@ class CampTix_Plugin {
 		$this->tickets_selected = array();
 		$coupon_used_count = 0;
 		$via_reservation = false;
-		$max_tickets_per_order = apply_filters( 'camptix_max_tickets_per_order', 10 );
+
+		$default_max = ! empty( $this->block_attributes['maxTicketsPerOrder'] )
+			? (int) $this->block_attributes['maxTicketsPerOrder']
+			: 10;
+		$max_tickets_per_order = apply_filters( 'camptix_max_tickets_per_order', $default_max );
+
+		// Auto-apply coupon from block attributes.
+		if ( empty( $_REQUEST['tix_coupon'] ) && ! empty( $this->block_attributes['coupon'] ) ) {
+			$_REQUEST['tix_coupon'] = sanitize_text_field( $this->block_attributes['coupon'] );
+		}
 
 		if ( count( $this->get_enabled_payment_methods() ) < 1 ) {
 			$this->error_flags['no_payment_methods'] = true;
@@ -5410,6 +5431,14 @@ class CampTix_Plugin {
 			}
 
 			$this->tickets[$ticket->ID] = $ticket;
+		}
+
+		// Filter tickets to only those specified by the block.
+		if ( ! empty( $this->block_attributes['ticketIds'] ) ) {
+			$this->tickets = array_intersect_key(
+				$this->tickets,
+				array_flip( $this->block_attributes['ticketIds'] )
+			);
 		}
 
 		unset( $tickets, $ticket );
@@ -5609,7 +5638,10 @@ class CampTix_Plugin {
 	 */
 	function form_start() {
 		$available_tickets = 0;
-		$max_tickets_per_order = apply_filters( 'camptix_max_tickets_per_order', 10 );
+		$default_max = ! empty( $this->block_attributes['maxTicketsPerOrder'] )
+			? (int) $this->block_attributes['maxTicketsPerOrder']
+			: 10;
+		$max_tickets_per_order = apply_filters( 'camptix_max_tickets_per_order', $default_max );
 
 		foreach ( $this->tickets as $ticket ) {
 			if ( $this->is_ticket_valid_for_purchase( $ticket->ID ) ) {
@@ -5630,11 +5662,17 @@ class CampTix_Plugin {
 		}
 
 		if ( ! $available_tickets && ! $this->is_wordcamp_closed() ) {
-			$this->notice( __( 'Sorry, but there are currently no tickets for sale. Please try again later.', 'wordcamporg' ) );
+			$no_tickets_msg = ! empty( $this->block_attributes['noTicketsMessage'] )
+				? $this->block_attributes['noTicketsMessage']
+				: __( 'Sorry, but there are currently no tickets for sale. Please try again later.', 'wordcamporg' );
+			$this->notice( $no_tickets_msg );
 		}
 
 		if ( $this->is_wordcamp_closed() ) {
-			$this->notice( __( 'This event has completed.', 'wordcamporg' ) );
+			$event_closed_msg = ! empty( $this->block_attributes['eventClosedMessage'] )
+				? $this->block_attributes['eventClosedMessage']
+				: __( 'This event has completed.', 'wordcamporg' );
+			$this->notice( $event_closed_msg );
 		}
 
 		if ( $available_tickets && isset( $this->reservation ) && $this->reservation ) {

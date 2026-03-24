@@ -1,0 +1,144 @@
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	CheckboxControl,
+	Disabled,
+	PanelBody,
+	Placeholder,
+	RangeControl,
+	TextControl,
+	TextareaControl,
+} from '@wordpress/components';
+
+const blockData = window.WordCampBlocks?.camptix || {};
+
+/**
+ * Format a price for display.
+ *
+ * @param {number} price
+ * @return {string} Formatted price string.
+ */
+function formatPrice( price ) {
+	if ( price === 0 ) {
+		return __( 'Free', 'wordcamporg' );
+	}
+	return '$' + Number( price ).toFixed( 2 );
+}
+
+export default function CamptixEdit( { attributes, setAttributes } ) {
+	const { ticketIds, maxTicketsPerOrder, coupon, noTicketsMessage, eventClosedMessage } = attributes;
+	const blockProps = useBlockProps();
+	const allTickets = blockData.tickets || [];
+
+	const displayTickets = ticketIds.length > 0
+		? allTickets.filter( ( t ) => ticketIds.includes( t.id ) )
+		: allTickets;
+
+	/**
+	 * Toggle a ticket ID in the ticketIds array.
+	 *
+	 * @param {number}  id      Ticket ID.
+	 * @param {boolean} checked Whether the ticket is selected.
+	 */
+	function toggleTicket( id, checked ) {
+		if ( checked ) {
+			setAttributes( { ticketIds: [ ...ticketIds, id ] } );
+		} else {
+			setAttributes( { ticketIds: ticketIds.filter( ( t ) => t !== id ) } );
+		}
+	}
+
+	return (
+		<>
+			<InspectorControls>
+				{ allTickets.length > 0 && (
+					<PanelBody title={ __( 'Ticket Selection', 'wordcamporg' ) }>
+						<p className="components-base-control__help">
+							{ __( 'Select specific tickets to display. Leave all unchecked to show all tickets.', 'wordcamporg' ) }
+						</p>
+						{ allTickets.map( ( ticket ) => (
+							<CheckboxControl
+								key={ ticket.id }
+								label={ `${ ticket.title } (${ formatPrice( ticket.price ) })` }
+								checked={ ticketIds.includes( ticket.id ) }
+								onChange={ ( checked ) => toggleTicket( ticket.id, checked ) }
+							/>
+						) ) }
+					</PanelBody>
+				) }
+				<PanelBody title={ __( 'Settings', 'wordcamporg' ) }>
+					<RangeControl
+						label={ __( 'Max tickets per order', 'wordcamporg' ) }
+						value={ maxTicketsPerOrder }
+						onChange={ ( value ) => setAttributes( { maxTicketsPerOrder: value } ) }
+						min={ 1 }
+						max={ 10 }
+					/>
+					<TextControl
+						label={ __( 'Auto-apply coupon code', 'wordcamporg' ) }
+						value={ coupon }
+						onChange={ ( value ) => setAttributes( { coupon: value } ) }
+						help={ __( 'Automatically apply this coupon when the page loads.', 'wordcamporg' ) }
+					/>
+				</PanelBody>
+				<PanelBody title={ __( 'Custom Messages', 'wordcamporg' ) } initialOpen={ false }>
+					<TextareaControl
+						label={ __( '"No tickets available" message', 'wordcamporg' ) }
+						value={ noTicketsMessage }
+						onChange={ ( value ) => setAttributes( { noTicketsMessage: value } ) }
+						placeholder={ __( 'Sorry, but there are currently no tickets for sale. Please try again later.', 'wordcamporg' ) }
+					/>
+					<TextareaControl
+						label={ __( '"Event closed" message', 'wordcamporg' ) }
+						value={ eventClosedMessage }
+						onChange={ ( value ) => setAttributes( { eventClosedMessage: value } ) }
+						placeholder={ __( 'This event has completed.', 'wordcamporg' ) }
+					/>
+				</PanelBody>
+			</InspectorControls>
+			<div { ...blockProps }>
+				{ displayTickets.length === 0 ? (
+					<Placeholder
+						label={ __( 'Tickets', 'wordcamporg' ) }
+						instructions={ __( 'No tickets have been created yet. Add tickets to see a preview here.', 'wordcamporg' ) }
+					/>
+				) : (
+					<Disabled>
+						<table className="tix-tickets-preview">
+							<thead>
+								<tr>
+									<th>{ __( 'Ticket', 'wordcamporg' ) }</th>
+									<th>{ __( 'Price', 'wordcamporg' ) }</th>
+									<th>{ __( 'Quantity', 'wordcamporg' ) }</th>
+								</tr>
+							</thead>
+							<tbody>
+								{ displayTickets.map( ( ticket ) => (
+									<tr key={ ticket.id }>
+										<td>{ ticket.title }</td>
+										<td>{ formatPrice( ticket.price ) }</td>
+										<td>
+											<select disabled>
+												{ [ ...Array( maxTicketsPerOrder + 1 ).keys() ].map( ( i ) => (
+													<option key={ i } value={ i }>{ i }</option>
+												) ) }
+											</select>
+										</td>
+									</tr>
+								) ) }
+							</tbody>
+						</table>
+						{ coupon && (
+							<p className="tix-coupon-preview">
+								{ __( 'Coupon:', 'wordcamporg' ) } <strong>{ coupon }</strong>
+							</p>
+						) }
+					</Disabled>
+				) }
+			</div>
+		</>
+	);
+}
