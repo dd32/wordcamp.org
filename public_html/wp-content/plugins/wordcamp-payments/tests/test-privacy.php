@@ -52,9 +52,8 @@ class Test_Privacy extends WP_UnitTestCase {
 		self::$editor_id      = $factory->user->create( array( 'role' => 'editor' ) );
 		self::$other_editor_id = $factory->user->create( array( 'role' => 'editor' ) );
 
-		// Grant manage_options to admin so current_user_can check passes.
-		$admin_user = get_user_by( 'id', self::$admin_id );
-		$admin_user->add_cap( 'manage_options' );
+		// In multisite, manage_options requires super admin.
+		grant_super_admin( self::$admin_id );
 
 		// Create a payment request post owned by editor.
 		self::$payment_post_id = $factory->post->create( array(
