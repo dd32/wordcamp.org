@@ -51,30 +51,19 @@ function exclude_others_payment_files_from_query( $clauses, $wp_query ) {
 	$reimbursement_type = Reimbursement_Requests\POST_TYPE;
 	$payment_type       = WCP_Payment_Request::POST_TYPE;
 
-	// Exclude attachments whose parent is a payment post, unless the current user is the attachment author
-	// or the parent post author.
-	// phpcs:disable WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+	// Join only payment-type parent posts so we can check authorship.
+	$clauses['join'] .= $wpdb->prepare(
+		" LEFT JOIN {$wpdb->posts} AS payment_parent ON {$wpdb->posts}.post_parent = payment_parent.ID AND payment_parent.post_type IN (%s, %s)",
+		$reimbursement_type,
+		$payment_type
+	);
+
+	// Allow the attachment if: no payment parent (NULL), or current user is the attachment/parent author.
 	$clauses['where'] .= $wpdb->prepare(
-		" AND NOT (
-			{$wpdb->posts}.post_parent IN (
-				SELECT ID FROM {$wpdb->posts} parent_post
-				WHERE parent_post.post_type IN (%s, %s)
-			)
-			AND {$wpdb->posts}.post_author != %d
-			AND {$wpdb->posts}.post_parent NOT IN (
-				SELECT ID FROM {$wpdb->posts} parent_post2
-				WHERE parent_post2.post_type IN (%s, %s)
-				AND parent_post2.post_author = %d
-			)
-		)",
-		$reimbursement_type,
-		$payment_type,
+		" AND ( payment_parent.ID IS NULL OR {$wpdb->posts}.post_author = %d OR payment_parent.post_author = %d )",
 		$user_id,
-		$reimbursement_type,
-		$payment_type,
 		$user_id
 	);
-	// phpcs:enable WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 
 	return $clauses;
 }
