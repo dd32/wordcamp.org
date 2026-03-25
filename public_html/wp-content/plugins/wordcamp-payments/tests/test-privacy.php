@@ -47,6 +47,11 @@ class Test_Privacy extends WP_UnitTestCase {
 	 */
 	private static $regular_attachment_id;
 
+	/**
+	 * Create test users, a payment post, and attachments for all tests.
+	 *
+	 * @param WP_UnitTest_Factory $factory Test factory.
+	 */
 	public static function wpSetUpBeforeClass( $factory ) {
 		self::$admin_id       = $factory->user->create( array( 'role' => 'administrator' ) );
 		self::$editor_id      = $factory->user->create( array( 'role' => 'editor' ) );
@@ -163,7 +168,10 @@ class Test_Privacy extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Verify found_posts matches the actual result count, preventing the original pagination bug.
+	 * Verify found_posts matches the actual result count.
+	 *
+	 * When filtering happens after the query (e.g. via the_posts), found_posts can be higher than
+	 * the actual number of returned posts, which breaks media library grid pagination.
 	 */
 	public function test_found_posts_matches_returned_count() {
 		$third_editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
