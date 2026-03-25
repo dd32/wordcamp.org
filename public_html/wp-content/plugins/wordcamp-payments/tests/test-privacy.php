@@ -107,6 +107,9 @@ class Test_Privacy extends WP_UnitTestCase {
 		return $query->posts;
 	}
 
+	/**
+	 * Admins (super admins in multisite) should see all attachments, including payment files.
+	 */
 	public function test_admin_sees_all_attachments() {
 		$ids = $this->query_attachments_as( self::$admin_id );
 
@@ -115,12 +118,18 @@ class Test_Privacy extends WP_UnitTestCase {
 		$this->assertContains( self::$regular_attachment_id, $ids );
 	}
 
+	/**
+	 * Editors should see payment attachments they uploaded.
+	 */
 	public function test_editor_sees_own_payment_attachment() {
 		$ids = $this->query_attachments_as( self::$editor_id );
 
 		$this->assertContains( self::$own_attachment_id, $ids, 'Editor should see their own attachment on their payment post.' );
 	}
 
+	/**
+	 * Editors should see all attachments on their own payment posts, even if uploaded by others.
+	 */
 	public function test_editor_sees_attachment_on_own_payment_post() {
 		// other_editor uploaded an attachment to editor's payment post.
 		// editor (the payment post author) should still see it.
@@ -129,6 +138,9 @@ class Test_Privacy extends WP_UnitTestCase {
 		$this->assertContains( self::$other_attachment_id, $ids, 'Editor should see attachments on their own payment post, even if uploaded by someone else.' );
 	}
 
+	/**
+	 * Editors unrelated to a payment post should not see its attachments.
+	 */
 	public function test_other_editor_cannot_see_payment_attachments() {
 		// A third editor who is neither the attachment author nor the payment post author.
 		$third_editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
@@ -139,6 +151,9 @@ class Test_Privacy extends WP_UnitTestCase {
 		$this->assertNotContains( self::$other_attachment_id, $ids, 'Unrelated editor should not see payment attachments from other users.' );
 	}
 
+	/**
+	 * Non-payment attachments should remain visible to all users.
+	 */
 	public function test_regular_attachments_visible_to_all() {
 		$third_editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
 
@@ -147,6 +162,9 @@ class Test_Privacy extends WP_UnitTestCase {
 		$this->assertContains( self::$regular_attachment_id, $ids, 'Regular attachments should be visible to all users.' );
 	}
 
+	/**
+	 * Verify found_posts matches the actual result count, preventing the original pagination bug.
+	 */
 	public function test_found_posts_matches_returned_count() {
 		$third_editor_id = self::factory()->user->create( array( 'role' => 'editor' ) );
 
