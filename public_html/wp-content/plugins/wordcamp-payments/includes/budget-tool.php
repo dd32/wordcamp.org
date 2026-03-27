@@ -1,6 +1,7 @@
 <?php
 
 use WordPressdotorg\MU_Plugins\Utilities\Export_CSV;
+use function WordCamp\Sunrise\get_top_level_domain;
 
 class WordCamp_Budget_Tool {
 
