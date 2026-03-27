@@ -121,7 +121,7 @@ class WordCamp_Budget_Tool {
 			$wordcamp         = get_wordcamp_post();
 			$tracker_link     = self::_get_tracker_url( $wordcamp );
 			$sender           = $wordcamp->meta['E-mail Address'][0] ?? '';
-			$headers          = $sender ? array( 'From: ' . $sender ) : array();
+			$headers          = $sender ? array( 'Reply-To: ' . $sender ) : array();
 
 			$content  = "A budget approval request has been submitted for {$event_name} by {$user->user_login}:\n\n";
 			$content .= "Budget page: {$budget_link}\n";
@@ -129,6 +129,7 @@ class WordCamp_Budget_Tool {
 				$content .= "Tracker entry: {$tracker_link}\n";
 			}
 			$content .= "\nYours, Mr. Budget Tool";
+
 			wp_mail( 'support@wordcamp.org', 'Budget Approval Requested: ' . $event_name, $content, $headers );
 
 		} elseif ( 'draft' === $budget['status'] && ! empty( $_POST['wcb-budget-request-review'] ) ) {
@@ -139,7 +140,7 @@ class WordCamp_Budget_Tool {
 			$wordcamp         = get_wordcamp_post();
 			$tracker_link     = self::_get_tracker_url( $wordcamp );
 			$sender           = $wordcamp->meta['E-mail Address'][0] ?? '';
-			$headers          = $sender ? array( 'From: ' . $sender ) : array();
+			$headers          = $sender ? array( 'Reply-To: ' . $sender ) : array();
 
 			$content  = "A budget review has been requested for {$event_name} by {$user->user_login}:\n\n";
 			$content .= "Budget page: {$budget_link}\n";
@@ -147,6 +148,7 @@ class WordCamp_Budget_Tool {
 				$content .= "Tracker entry: {$tracker_link}\n";
 			}
 			$content .= "\nYours, Mr. Budget Tool";
+
 			wp_mail( 'support@wordcamp.org', 'Budget Review Requested: ' . $event_name, $content, $headers );
 
 		} elseif ( 'pending' === $budget['status'] && current_user_can( 'wcb_approve_budget' ) ) {
