@@ -15,7 +15,7 @@ function enqueue_favorite_sessions_dependencies() {
 	wp_enqueue_script(
 		'favourite-sessions',
 		plugin_dir_url( __DIR__ ) . 'js/favourite-sessions.js',
-		array( 'jquery' ),
+		array( 'jquery', 'wp-api-fetch' ),
 		filemtime( plugin_dir_path( __DIR__ ) . 'js/favourite-sessions.js' ),
 		true
 	);
@@ -24,8 +24,6 @@ function enqueue_favorite_sessions_dependencies() {
 		'favourite-sessions',
 		'favSessionsPhpObject',
 		array(
-			'root'                  => esc_url_raw( rest_url() ),
-			'nonce'                 => wp_create_nonce( 'wp_rest' ),
 			'isLoggedIn'            => is_user_logged_in(),
 			'preloadedFavSessions'  => is_user_logged_in() ? WordCamp\Post_Types\REST_API\get_preloaded_fav_sessions() : false,
 			'i18n'                  => array(

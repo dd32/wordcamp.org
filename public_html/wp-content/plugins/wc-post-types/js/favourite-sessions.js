@@ -103,14 +103,10 @@ jQuery( document ).ready( function ( $ ) {
 				var favSessions = self.get();
 				var sessionIds = Object.keys( favSessions ).map( Number );
 
-				$.ajax( {
+				wp.apiFetch( {
+					path: '/wc-post-types/v1/fav-sessions/',
 					method: 'POST',
-					url: favSessionsPhpObject.root + 'wc-post-types/v1/fav-sessions/',
-					data: JSON.stringify( { 'session_ids': sessionIds } ),
-					contentType: 'application/json',
-					beforeSend: function( xhr ) {
-						xhr.setRequestHeader( 'X-WP-Nonce', favSessionsPhpObject.nonce );
-					},
+					data: { 'session_ids': sessionIds },
 				} );
 			}, 1000 );
 		},
@@ -136,20 +132,15 @@ jQuery( document ).ready( function ( $ ) {
 				self.mergeServerData( serverData );
 				callback();
 			} else {
-				$.ajax( {
+				wp.apiFetch( {
+					path: '/wc-post-types/v1/fav-sessions/',
 					method: 'GET',
-					url: favSessionsPhpObject.root + 'wc-post-types/v1/fav-sessions/',
-					beforeSend: function( xhr ) {
-						xhr.setRequestHeader( 'X-WP-Nonce', favSessionsPhpObject.nonce );
-					},
-					success: function( response ) {
-						self.mergeServerData( response );
-						callback();
-					},
-					error: function() {
-						// If server request fails, just use local storage.
-						callback();
-					},
+				} ).then( function( response ) {
+					self.mergeServerData( response );
+					callback();
+				} ).catch( function() {
+					// If server request fails, just use local storage.
+					callback();
 				} );
 			}
 		},
