@@ -946,30 +946,6 @@ function get_fav_sessions_meta_key() {
 }
 
 /**
- * Get pre-loaded favourite sessions data for the current user.
- *
- * Used to inline the data in wp_localize_script, avoiding an extra REST API
- * request on page load.
- *
- * @return array|false The session data array, or false if the user is not logged in.
- */
-function get_preloaded_fav_sessions() {
-	if ( ! is_user_logged_in() ) {
-		return false;
-	}
-
-	$user_id     = get_current_user_id();
-	$meta_key    = get_fav_sessions_meta_key();
-	$session_ids = get_user_meta( $user_id, $meta_key, true );
-
-	if ( ! is_array( $session_ids ) ) {
-		$session_ids = array();
-	}
-
-	return array( 'session_ids' => array_map( 'absint', $session_ids ) );
-}
-
-/**
  * Sanitize the 'first_time' meta value before storing it.
  *
  * @param string $value The unsanitized meta value.

@@ -25,7 +25,6 @@ function enqueue_favorite_sessions_dependencies() {
 		'favSessionsPhpObject',
 		array(
 			'isLoggedIn'            => is_user_logged_in(),
-			'preloadedFavSessions'  => is_user_logged_in() ? WordCamp\Post_Types\REST_API\get_preloaded_fav_sessions() : false,
 			'i18n'                  => array(
 				'reqTimeOut'           => esc_html__( 'Sorry, the email request timed out.', 'wordcamporg' ),
 				'otherError'           => esc_html__( 'Sorry, the email request failed.',    'wordcamporg' ),
@@ -35,6 +34,24 @@ function enqueue_favorite_sessions_dependencies() {
 			),
 		)
 	);
+
+	// Preload the fav-sessions endpoint so wp.apiFetch serves it from cache on first request.
+	if ( is_user_logged_in() ) {
+		$preload_data = array_reduce(
+			array( '/wc-post-types/v1/fav-sessions/' ),
+			'rest_preload_api_request',
+			array()
+		);
+
+		wp_add_inline_script(
+			'wp-api-fetch',
+			sprintf(
+				'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
+				wp_json_encode( $preload_data )
+			),
+			'after'
+		);
+	}
 
 	wp_enqueue_style(
 		'favorite-sessions',

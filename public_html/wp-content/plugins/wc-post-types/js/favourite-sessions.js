@@ -125,24 +125,15 @@ jQuery( document ).ready( function ( $ ) {
 
 			var self = this;
 
-			// Use pre-loaded data if available, otherwise fetch from server.
-			var serverData = favSessionsPhpObject.preloadedFavSessions;
-
-			if ( serverData ) {
-				self.mergeServerData( serverData );
+			wp.apiFetch( {
+				path: '/wc-post-types/v1/fav-sessions/',
+			} ).then( function( response ) {
+				self.mergeServerData( response );
 				callback();
-			} else {
-				wp.apiFetch( {
-					path: '/wc-post-types/v1/fav-sessions/',
-					method: 'GET',
-				} ).then( function( response ) {
-					self.mergeServerData( response );
-					callback();
-				} ).catch( function() {
-					// If server request fails, just use local storage.
-					callback();
-				} );
-			}
+			} ).catch( function() {
+				// If server request fails, just use local storage.
+				callback();
+			} );
 		},
 
 		/**
