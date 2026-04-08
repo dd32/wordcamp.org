@@ -1,0 +1,93 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"align":"full","className":"groups-site-hero","style":{"spacing":{"padding":{"top":"var:preset|spacing|70","bottom":"var:preset|spacing|70","left":"var:preset|spacing|edge-space","right":"var:preset|spacing|edge-space"}}},"backgroundColor":"blueberry-4","layout":{"type":"constrained","wideSize":"1280px"}} -->
+<div class="wp-block-group alignfull groups-site-hero has-blueberry-4-background-color has-background" style="padding-top:var(--wp--preset--spacing--70);padding-right:var(--wp--preset--spacing--edge-space);padding-bottom:var(--wp--preset--spacing--70);padding-left:var(--wp--preset--spacing--edge-space)">
+	<!-- wp:columns {"verticalAlignment":"center","style":{"spacing":{"blockGap":{"left":"var:preset|spacing|60"}}}} -->
+	<div class="wp-block-columns are-vertically-aligned-center">
+
+		<!-- wp:column {"verticalAlignment":"center","width":"60%"} -->
+		<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:60%">
+			<!-- wp:paragraph {"fontSize":"small","textColor":"blueberry-1","style":{"typography":{"textTransform":"uppercase","letterSpacing":"0.08em","fontWeight":"600"},"spacing":{"margin":{"bottom":"var:preset|spacing|20"}}}} -->
+			<p class="has-blueberry-1-color has-text-color has-small-font-size" style="margin-bottom:var(--wp--preset--spacing--20);font-weight:600;letter-spacing:0.08em;text-transform:uppercase">A WordPress Group</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:site-title {"level":1,"fontSize":"heading-1","style":{"spacing":{"margin":{"bottom":"var:preset|spacing|30"}},"typography":{"lineHeight":"1.05"}}} /-->
+
+			<!-- wp:paragraph {"fontSize":"large","textColor":"charcoal-3","style":{"spacing":{"margin":{"bottom":"var:preset|spacing|40"}}}} -->
+			<p class="has-charcoal-3-color has-text-color has-large-font-size" style="margin-bottom:var(--wp--preset--spacing--40)">Connect with fellow WordPress enthusiasts. Join us for local meetups, workshops, and hands-on learning &mdash; all skill levels welcome.</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:buttons {"layout":{"type":"flex","flexWrap":"wrap"}} -->
+			<div class="wp-block-buttons">
+				<!-- wp:button -->
+				<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="#upcoming">Browse events</a></div>
+				<!-- /wp:button -->
+
+				<!-- wp:button {"className":"is-style-outline","textColor":"blueberry-1","style":{"border":{"color":"var:preset|color|blueberry-1","width":"1px"}}} -->
+				<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-blueberry-1-color has-text-color has-border-color wp-element-button" href="#about" style="border-color:var(--wp--preset--color--blueberry-1);border-width:1px">About this group</a></div>
+				<!-- /wp:button -->
+			</div>
+			<!-- /wp:buttons -->
+		</div>
+		<!-- /wp:column -->
+
+		<!-- wp:column {"verticalAlignment":"center","width":"40%"} -->
+		<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:40%">
+			<!-- wp:image {"sizeSlug":"large","linkDestination":"none","className":"groups-site-hero__image","style":{"border":{"radius":"4px"}}} -->
+			<figure class="wp-block-image size-large has-custom-border groups-site-hero__image"><img alt="" style="border-radius:4px" src="https://s.w.org/images/core/5.5/don-quixote-1.jpg"/></figure>
+			<!-- /wp:image -->
+		</div>
+		<!-- /wp:column -->
+
+	</div>
+	<!-- /wp:columns -->
+</div>
+<!-- /wp:group -->
+
+<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"var:preset|spacing|70","bottom":"var:preset|spacing|70","left":"var:preset|spacing|edge-space","right":"var:preset|spacing|edge-space"}}},"layout":{"type":"constrained","wideSize":"1160px"}} -->
+<main class="wp-block-group" id="main" style="padding-top:var(--wp--preset--spacing--70);padding-right:var(--wp--preset--spacing--edge-space);padding-bottom:var(--wp--preset--spacing--70);padding-left:var(--wp--preset--spacing--edge-space)">
+
+	<!-- wp:group {"className":"groups-site-section","anchor":"upcoming","style":{"spacing":{"margin":{"bottom":"var:preset|spacing|70"}}},"layout":{"type":"constrained","contentSize":"1160px","justifyContent":"left"}} -->
+	<div id="upcoming" class="wp-block-group groups-site-section" style="margin-bottom:var(--wp--preset--spacing--70)">
+		<!-- wp:group {"align":"wide","style":{"spacing":{"margin":{"bottom":"var:preset|spacing|40"}}},"layout":{"type":"flex","justifyContent":"space-between","flexWrap":"wrap","verticalAlignment":"center"}} -->
+		<div class="wp-block-group alignwide" style="margin-bottom:var(--wp--preset--spacing--40)">
+			<!-- wp:group {"layout":{"type":"flex","flexWrap":"wrap","verticalAlignment":"center"},"style":{"spacing":{"blockGap":"var:preset|spacing|30"}}} -->
+			<div class="wp-block-group">
+				<!-- wp:heading {"level":2,"fontSize":"heading-3","style":{"spacing":{"margin":{"bottom":"0"}}}} -->
+				<h2 class="wp-block-heading has-heading-3-font-size" style="margin-bottom:0">Upcoming events</h2>
+				<!-- /wp:heading -->
+
+				<!-- wp:pattern {"slug":"groups-site/manage-event-cta"} /-->
+			</div>
+			<!-- /wp:group -->
+
+			<!-- wp:pattern {"slug":"groups-site/view-all-events-link"} /-->
+		</div>
+		<!-- /wp:group -->
+
+		<!-- wp:group {"align":"wide"} -->
+		<div class="wp-block-group alignwide">
+			<!-- wp:pattern {"slug":"groups-site/upcoming-events-cards"} /-->
+		</div>
+		<!-- /wp:group -->
+	</div>
+	<!-- /wp:group -->
+
+	<!-- wp:separator {"className":"is-style-wide","backgroundColor":"light-grey-1"} -->
+	<hr class="wp-block-separator has-text-color has-light-grey-1-color has-alpha-channel-opacity has-light-grey-1-background-color has-background is-style-wide"/>
+	<!-- /wp:separator -->
+
+	<!-- wp:group {"className":"groups-site-section","anchor":"about","style":{"spacing":{"margin":{"top":"var:preset|spacing|70"}}},"layout":{"type":"constrained","contentSize":"768px","justifyContent":"left"}} -->
+	<div id="about" class="wp-block-group groups-site-section" style="margin-top:var(--wp--preset--spacing--70)">
+		<!-- wp:heading {"level":2,"fontSize":"heading-3","style":{"spacing":{"margin":{"bottom":"var:preset|spacing|30"}}}} -->
+		<h2 class="wp-block-heading has-heading-3-font-size" style="margin-bottom:var(--wp--preset--spacing--30)">About this group</h2>
+		<!-- /wp:heading -->
+
+		<!-- wp:post-content /-->
+	</div>
+	<!-- /wp:group -->
+
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->

@@ -1,0 +1,38 @@
+/**
+ * Responsive styles for the WordPress Group theme.
+ *
+ * @package Groups_Site
+ */
+
+img,
+video,
+iframe {
+	max-width: 100%;
+	height: auto;
+}
+
+.groups-site-event-hero img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+/* Up to 781px (mobile + small tablet): collapse the event two-column layout. */
+@media (max-width: 781px) {
+	.groups-site-event-layout {
+		flex-direction: column !important;
+	}
+
+	.groups-site-event-layout .wp-block-column {
+		flex-basis: 100% !important;
+	}
+}
+
+/* Desktop: stick the event sidebar info card to the top while scrolling. */
+@media (min-width: 1024px) {
+	.groups-site-event-sidebar .groups-site-event-info-card {
+		position: sticky;
+		top: 96px;
+	}
+}
