@@ -15,7 +15,6 @@ add_filter( 'network_admin_plugin_action_links', __NAMESPACE__ . '\network_plugi
 add_action( 'network_admin_notices', __NAMESPACE__ . '\network_plugin_notifier' );
 add_action( 'admin_notices', __NAMESPACE__ . '\network_plugin_notifier' );
 
-
 /**
  * The two arrays here depict the intended network activation state of each
  * plugin on WordCamp.org. When plugins are added, removed, or their state is
@@ -92,6 +91,31 @@ function _get_network_plugin_state_list( $state ) {
 
 	if ( EVENTS_NETWORK_ID === $network_id ) {
 		// Any Events specific plugins expected to be network activated.
+	}
+
+	if ( GROUPS_NETWORK_ID === $network_id ) {
+		// The groups network is intentionally minimal: every plugin in the
+		// shared `activated` list above should be deactivated, and only
+		// GatherPress is network-activated. This keeps `/group/<slug>/`
+		// subsites isolated from the events network's plugin set.
+		$network_plugin_state['deactivated'] = array_merge(
+			$network_plugin_state['deactivated'],
+			$network_plugin_state['activated']
+		);
+		$network_plugin_state['activated']   = array(
+			'akismet/akismet.php',
+			'gatherpress/gatherpress.php',
+			'gutenberg/gutenberg.php',
+			'jetpack/jetpack.php',
+			'two-factor/two-factor.php',
+			'two-factor-provider-webauthn/two-factor-provider-webauthn.php',
+			'wporg-two-factor/wporg-two-factor.php',
+		);
+
+		if ( 'local' !== wp_get_environment_type() ) {
+			$network_plugin_state['activated'][] = 'wordcamp-participation-notifier/wordcamp-participation-notifier.php';
+			$network_plugin_state['activated'][] = 'wporg-profiles-wp-activity-notifier/wporg-profiles-wp-activity-notifier.php';
+		}
 	}
 
 	if ( CAMPUS_NETWORK_ID === $network_id ) {
