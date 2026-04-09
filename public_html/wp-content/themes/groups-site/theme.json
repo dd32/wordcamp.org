@@ -5,6 +5,7 @@
 		"appearanceTools": true,
 		"color": {
 			"palette": [
+				{ "slug": "charcoal-0",     "color": "#1a1919", "name": "Charcoal 0" },
 				{ "slug": "charcoal-1",     "color": "#1e1e1e", "name": "Charcoal" },
 				{ "slug": "charcoal-2",     "color": "#23282d", "name": "Charcoal 2" },
 				{ "slug": "charcoal-3",     "color": "#40464d", "name": "Charcoal 3" },
@@ -111,7 +112,7 @@
 	"styles": {
 		"color": {
 			"background": "var(--wp--preset--color--white)",
-			"text": "var(--wp--preset--color--charcoal-1)"
+			"text": "var(--wp--preset--color--charcoal-0)"
 		},
 		"typography": {
 			"fontFamily": "var(--wp--preset--font-family--inter)",
@@ -128,7 +129,7 @@
 					"fontWeight": "400",
 					"lineHeight": "1.3"
 				},
-				"color": { "text": "var(--wp--preset--color--charcoal-1)" }
+				"color": { "text": "var(--wp--preset--color--charcoal-0)" }
 			},
 			"h1": { "typography": { "fontSize": "var(--wp--preset--font-size--heading-1)", "lineHeight": "1.1"  } },
 			"h2": { "typography": { "fontSize": "var(--wp--preset--font-size--heading-2)", "lineHeight": "1.2"  } },
@@ -163,11 +164,11 @@
 				"typography": {
 					"fontFamily": "var(--wp--preset--font-family--eb-garamond)",
 					"fontSize": "var(--wp--preset--font-size--heading-5)",
-					"fontWeight": "500"
+					"fontWeight": "400"
 				},
 				"elements": {
 					"link": {
-						"color": { "text": "var(--wp--preset--color--charcoal-1)" },
+						"color": { "text": "var(--wp--preset--color--charcoal-0)" },
 						"typography": { "textDecoration": "none" },
 						":hover": { "color": { "text": "var(--wp--preset--color--blueberry-1)" } }
 					}
@@ -177,11 +178,11 @@
 				"typography": {
 					"fontFamily": "var(--wp--preset--font-family--inter)",
 					"fontSize": "var(--wp--preset--font-size--normal)",
-					"fontWeight": "500"
+					"fontWeight": "400"
 				},
 				"elements": {
 					"link": {
-						"color": { "text": "var(--wp--preset--color--charcoal-1)" },
+						"color": { "text": "var(--wp--preset--color--charcoal-0)" },
 						"typography": { "textDecoration": "none" },
 						":hover": { "color": { "text": "var(--wp--preset--color--blueberry-1)" } }
 					}
@@ -195,7 +196,7 @@
 				},
 				"elements": {
 					"link": {
-						"color": { "text": "var(--wp--preset--color--charcoal-1)" },
+						"color": { "text": "var(--wp--preset--color--charcoal-0)" },
 						"typography": { "textDecoration": "none" },
 						":hover": { "typography": { "textDecoration": "underline" } }
 					}
