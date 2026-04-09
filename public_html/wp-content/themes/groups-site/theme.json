@@ -214,7 +214,6 @@
 	},
 	"templateParts": [
 		{ "name": "header", "title": "Header", "area": "header" },
-		{ "name": "header-inner", "title": "Header (Inner Pages)", "area": "header" },
 		{ "name": "footer", "title": "Footer", "area": "footer" }
 	],
 	"customTemplates": [

@@ -1,4 +1,21 @@
-<!-- wp:wporg/global-header {"style":{"border":{"bottom":{"color":"var:preset|color|light-grey-1","width":"1px"}},"elements":{"link":{"color":{"text":"var:preset|color|charcoal-1"}}}},"backgroundColor":"white","textColor":"charcoal-1"} /-->
+<?php
+/**
+ * Title: Local Navigation
+ * Slug: groups-site/local-navigation
+ * Inserter: no
+ *
+ * Sticky breadcrumb-style site-title + page navigation bar for inner pages.
+ * Must be placed OUTSIDE the header template-part in each template so the
+ * sticky positioning works against the viewport, not the header wrapper.
+ *
+ * @package WordCamp\Groups\Site
+ */
+
+namespace WordCamp\Groups\Site\Patterns\LocalNavigation;
+
+defined( 'ABSPATH' ) || exit;
+
+?>
 
 <!-- wp:wporg/local-navigation-bar {"backgroundColor":"white","style":{"elements":{"link":{"color":{"text":"var:preset|color|charcoal-1"},":hover":{"color":{"text":"var:preset|color|charcoal-1"}}}}},"textColor":"charcoal-1","fontSize":"small"} -->
 
