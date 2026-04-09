@@ -42,19 +42,6 @@
 }
 
 /* ==========================================================================
-   Local header — site title + page nav (inner pages)
-   ========================================================================== */
-
-.groups-site-local-header .wp-block-navigation a {
-	text-decoration: none;
-	transition: color 0.15s ease;
-}
-
-.groups-site-local-header .wp-block-navigation .current-menu-item > a {
-	color: var(--wp--preset--color--blueberry-1);
-}
-
-/* ==========================================================================
    Local navigation (below the hero on the front page)
    ========================================================================== */
 
