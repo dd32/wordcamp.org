@@ -46,6 +46,22 @@
    Front-page hero
    ========================================================================== */
 
+.groups-site-hero {
+	position: relative;
+	overflow: hidden;
+	background-image:
+		linear-gradient(
+			to right,
+			var(--wp--preset--color--blueberry-4) 0%,
+			var(--wp--preset--color--blueberry-4) 45%,
+			transparent 70%
+		),
+		url('https://wordpress.org/files/2025/12/education-main-section.png');
+	background-position: right center;
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+
 .groups-site-hero h1,
 .groups-site-hero .wp-block-site-title {
 	text-wrap: balance;
@@ -56,9 +72,10 @@
 	border-color: var(--wp--preset--color--deep-blueberry);
 }
 
-.groups-site-hero__image img {
-	box-shadow: 0 24px 48px -16px rgba(30, 30, 30, 0.18),
-		0 8px 16px -8px rgba(30, 30, 30, 0.08);
+@media (max-width: 781px) {
+	.groups-site-hero {
+		background-image: none;
+	}
 }
 
 /* ==========================================================================
