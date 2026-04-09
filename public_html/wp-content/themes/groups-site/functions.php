@@ -5,8 +5,10 @@
  * Default theme for individual WordPress Group sites on events.wordpress.org.
  * Designed to pair with the GatherPress plugin (events, RSVPs, venues).
  *
- * @package Groups_Site
+ * @package WordCamp\Groups\Site
  */
+
+namespace WordCamp\Groups\Site;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -15,17 +17,17 @@ require_once __DIR__ . '/inc/event-cards.php';
 /**
  * Theme support.
  */
-function groups_site_setup() {
+function setup() {
 	add_theme_support( 'post-thumbnails' );
 	add_theme_support( 'editor-styles' );
 	add_theme_support( 'wp-block-styles' );
 }
-add_action( 'after_setup_theme', 'groups_site_setup' );
+add_action( 'after_setup_theme', __NAMESPACE__ . '\setup' );
 
 /**
  * Enqueue theme stylesheets.
  */
-function groups_site_enqueue_assets() {
+function enqueue_assets() {
 	wp_enqueue_style(
 		'groups-site-custom',
 		get_theme_file_uri( 'assets/css/custom.css' ),
@@ -40,13 +42,13 @@ function groups_site_enqueue_assets() {
 		filemtime( get_theme_file_path( 'assets/css/responsive.css' ) )
 	);
 }
-add_action( 'wp_enqueue_scripts', 'groups_site_enqueue_assets' );
-add_action( 'enqueue_block_editor_assets', 'groups_site_enqueue_assets' );
+add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\enqueue_assets' );
+add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\enqueue_assets' );
 
 /**
  * Register a block pattern category for the theme.
  */
-function groups_site_register_pattern_category() {
+function register_pattern_category() {
 	register_block_pattern_category(
 		'groups-site',
 		[
@@ -54,7 +56,7 @@ function groups_site_register_pattern_category() {
 		]
 	);
 }
-add_action( 'init', 'groups_site_register_pattern_category' );
+add_action( 'init', __NAMESPACE__ . '\register_pattern_category' );
 
 /**
  * Trim the auto-generated page list in the theme's primary navigation.
@@ -74,7 +76,7 @@ add_action( 'init', 'groups_site_register_pattern_category' );
  * @param \WP_Post[]|false $pages List of page objects, false on early bail.
  * @return \WP_Post[]|false
  */
-function groups_site_filter_nav_page_list( $pages ) {
+function filter_nav_page_list( $pages ) {
 	if ( ! is_array( $pages ) ) {
 		return $pages;
 	}
@@ -94,7 +96,7 @@ function groups_site_filter_nav_page_list( $pages ) {
 		}
 	) );
 }
-add_filter( 'get_pages', 'groups_site_filter_nav_page_list' );
+add_filter( 'get_pages', __NAMESPACE__ . '\filter_nav_page_list' );
 
 /**
  * Inject the theme's custom GatherPress templates into the template hierarchy.
@@ -105,7 +107,7 @@ add_filter( 'get_pages', 'groups_site_filter_nav_page_list' );
  * `gatherpress_event` / `gatherpress_venue` post picks up `single-event` /
  * `archive-event` / `single-venue` without anyone having to set it by hand.
  */
-function groups_site_single_template_hierarchy( $templates ) {
+function single_template_hierarchy( $templates ) {
 	$post_type = get_post_type();
 	if ( 'gatherpress_event' === $post_type ) {
 		array_unshift( $templates, 'single-event' );
@@ -114,15 +116,15 @@ function groups_site_single_template_hierarchy( $templates ) {
 	}
 	return $templates;
 }
-add_filter( 'single_template_hierarchy', 'groups_site_single_template_hierarchy' );
+add_filter( 'single_template_hierarchy', __NAMESPACE__ . '\single_template_hierarchy' );
 
-function groups_site_archive_template_hierarchy( $templates ) {
+function archive_template_hierarchy( $templates ) {
 	if ( is_post_type_archive( 'gatherpress_event' ) ) {
 		array_unshift( $templates, 'archive-event' );
 	}
 	return $templates;
 }
-add_filter( 'archive_template_hierarchy', 'groups_site_archive_template_hierarchy' );
+add_filter( 'archive_template_hierarchy', __NAMESPACE__ . '\archive_template_hierarchy' );
 
 /**
  * Strip GatherPress metadata blocks from `the_content` on the single-event view.
@@ -133,7 +135,7 @@ add_filter( 'archive_template_hierarchy', 'groups_site_archive_template_hierarch
  * end up with each one twice. Strip the metadata blocks here so `post-content`
  * only renders the user's actual description prose.
  */
-function groups_site_strip_event_metadata_blocks( $content ) {
+function strip_event_metadata_blocks( $content ) {
 	if ( ! is_singular( 'gatherpress_event' ) || ! in_the_loop() || ! is_main_query() ) {
 		return $content;
 	}
@@ -161,7 +163,7 @@ function groups_site_strip_event_metadata_blocks( $content ) {
 
 	return serialize_blocks( $kept );
 }
-add_filter( 'the_content', 'groups_site_strip_event_metadata_blocks', 5 );
+add_filter( 'the_content', __NAMESPACE__ . '\strip_event_metadata_blocks', 5 );
 
 /**
  * Reshape the comment form into a compact "leave a reply" composer.
@@ -171,7 +173,7 @@ add_filter( 'the_content', 'groups_site_strip_event_metadata_blocks', 5 );
  * textarea so it reads like a meetup-style discussion box. Only applies on
  * `gatherpress_event` singulars so we don't change comment forms elsewhere.
  */
-function groups_site_event_comment_form_defaults( $defaults ) {
+function event_comment_form_defaults( $defaults ) {
 	if ( ! is_singular( 'gatherpress_event' ) ) {
 		return $defaults;
 	}
@@ -194,4 +196,4 @@ function groups_site_event_comment_form_defaults( $defaults ) {
 
 	return $defaults;
 }
-add_filter( 'comment_form_defaults', 'groups_site_event_comment_form_defaults' );
+add_filter( 'comment_form_defaults', __NAMESPACE__ . '\event_comment_form_defaults' );

@@ -1,14 +1,14 @@
 <?php
 /**
- * Capability helpers for WPorg Groups Frontend.
+ * Capability helpers for the groups frontend mu-plugin.
  *
  * Centralises the "can this user manage events on this group?" check so the
  * block, the routing layer, and the form handler all agree.
  *
- * @package WPorg_Groups_Frontend
+ * @package WordCamp\Groups\Frontend
  */
 
-namespace WPorg_Groups_Frontend\Capabilities;
+namespace WordCamp\Groups\Frontend\Capabilities;
 
 defined( 'WPINC' ) || die();
 

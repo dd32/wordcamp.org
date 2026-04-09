@@ -2,10 +2,10 @@
 /**
  * Default field values for the front-end event form.
  *
- * @package WPorg_Groups_Frontend
+ * @package WordCamp\Groups\Frontend
  */
 
-namespace WPorg_Groups_Frontend\Defaults;
+namespace WordCamp\Groups\Frontend\Defaults;
 
 defined( 'WPINC' ) || die();
 
@@ -101,7 +101,7 @@ function get_most_recent_event_id(): int {
  * venue, RSVP, etc.) and is hidden from the editor on load and preserved
  * on save.
  *
- * Kept in sync with `WPorg_Groups_Frontend\REST\build_post_content()`.
+ * Kept in sync with `WordCamp\Groups\Frontend\REST\build_post_content()`.
  */
 const DESCRIPTION_BLOCK_NAMES = array(
 	'core/paragraph',

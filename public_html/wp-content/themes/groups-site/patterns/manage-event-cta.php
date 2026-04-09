@@ -14,15 +14,16 @@
  * can attach a click handler and open the create-event modal in place.
  * No URL — there's no `/create-event/` page anymore.
  *
- * @package Groups_Site
+ * @package WordCamp\Groups\Site
  */
+
+namespace WordCamp\Groups\Site\Patterns\ManageEventCta;
+
+use function WordCamp\Groups\Frontend\Capabilities\current_user_can_manage_events;
 
 defined( 'ABSPATH' ) || exit;
 
-if (
-	! function_exists( 'WPorg_Groups_Frontend\\Capabilities\\current_user_can_manage_events' )
-	|| ! \WPorg_Groups_Frontend\Capabilities\current_user_can_manage_events()
-) {
+if ( ! current_user_can_manage_events() ) {
 	return;
 }
 ?>

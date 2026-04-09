@@ -17,10 +17,10 @@
  *
  * All routes require the `current_user_can_manage_events()` capability.
  *
- * @package WPorg_Groups_Frontend
+ * @package WordCamp\Groups\Frontend
  */
 
-namespace WPorg_Groups_Frontend\REST;
+namespace WordCamp\Groups\Frontend\REST;
 
 defined( 'WPINC' ) || die();
 
@@ -31,12 +31,12 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 
-use const WPorg_Groups_Frontend\Defaults\DESCRIPTION_BLOCK_NAMES;
+use const WordCamp\Groups\Frontend\Defaults\DESCRIPTION_BLOCK_NAMES;
 
-use function WPorg_Groups_Frontend\Capabilities\current_user_can_manage_events;
-use function WPorg_Groups_Frontend\Defaults\extract_description_blocks;
-use function WPorg_Groups_Frontend\Defaults\get_default_event_data;
-use function WPorg_Groups_Frontend\Defaults\get_event_venue_post_id;
+use function WordCamp\Groups\Frontend\Capabilities\current_user_can_manage_events;
+use function WordCamp\Groups\Frontend\Defaults\extract_description_blocks;
+use function WordCamp\Groups\Frontend\Defaults\get_default_event_data;
+use function WordCamp\Groups\Frontend\Defaults\get_event_venue_post_id;
 
 const NAMESPACE_V1 = 'wporg-groups/v1';
 

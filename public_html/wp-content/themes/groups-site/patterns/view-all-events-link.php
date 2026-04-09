@@ -10,13 +10,15 @@
  * the "Upcoming events" section heading so the link works on path-based
  * multisite installs.
  *
- * @package Groups_Site
+ * @package WordCamp\Groups\Site
  */
+
+namespace WordCamp\Groups\Site\Patterns\ViewAllEventsLink;
 
 defined( 'ABSPATH' ) || exit;
 
-$groups_site_events_url = esc_url( home_url( '/event/' ) );
+$events_url = esc_url( home_url( '/event/' ) );
 ?>
 <!-- wp:paragraph {"fontSize":"small"} -->
-<p class="has-small-font-size"><a href="<?php echo $groups_site_events_url; ?>">View all events &rarr;</a></p>
+<p class="has-small-font-size"><a href="<?php echo $events_url; ?>">View all events &rarr;</a></p>
 <!-- /wp:paragraph -->

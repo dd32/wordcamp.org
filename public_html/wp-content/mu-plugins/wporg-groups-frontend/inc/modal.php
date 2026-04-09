@@ -14,14 +14,14 @@
  *      the React app.
  *   3. Capability gating — visitors and unprivileged users get nothing.
  *
- * @package WPorg_Groups_Frontend
+ * @package WordCamp\Groups\Frontend
  */
 
-namespace WPorg_Groups_Frontend\Modal;
+namespace WordCamp\Groups\Frontend\Modal;
 
 defined( 'WPINC' ) || die();
 
-use function WPorg_Groups_Frontend\Capabilities\current_user_can_manage_events;
+use function WordCamp\Groups\Frontend\Capabilities\current_user_can_manage_events;
 
 const SCRIPT_HANDLE = 'wporg-groups-event-modal';
 const STYLE_HANDLE  = 'wporg-groups-event-modal';

@@ -14,7 +14,7 @@
  * this is a fair price for not having to wire up `@wordpress/scripts` for
  * a single feature.
  *
- * @package WPorg_Groups_Frontend
+ * @package WordCamp\Groups\Frontend
  */
 ( function ( wp ) {
 	'use strict';

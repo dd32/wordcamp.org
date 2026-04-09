@@ -15,10 +15,13 @@
  *   - `render_event_cards( $query, $opts )` outputs the `.groups-site-event-cards`
  *                                           grid for a WP_Query of events.
  *
- * @package Groups_Site
+ * @package WordCamp\Groups\Site
  */
 
-namespace Groups_Site\Event_Cards;
+namespace WordCamp\Groups\Site\Event_Cards;
+
+use GatherPress\Core\Event;
+use WP_Query;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -37,7 +40,7 @@ defined( 'ABSPATH' ) || exit;
  * timestamp would silently shift hours away from the organizer's
  * intent for any event in a non-UTC timezone.
  */
-function format_card_datetime( \GatherPress\Core\Event $event ): string {
+function format_card_datetime( Event $event ): string {
 	$post_id = $event->event ? (int) $event->event->ID : 0;
 	if ( ! $post_id ) {
 		return $event->get_display_datetime();
@@ -125,13 +128,13 @@ function extract_card_excerpt( int $post_id, int $word_limit = 22 ): string {
  * the wrapper class names declared on the parent `.groups-site-event-cards`
  * element by the caller via `$opts['classes']`.
  *
- * @param \WP_Query $query Event query (gatherpress_event posts).
- * @param array     $opts  Optional: `classes` (string) extra CSS classes,
- *                         `excerpt_words` (int) words to keep in excerpt,
- *                         `is_past` (bool) treat as past events for muted
- *                         visual styling.
+ * @param WP_Query $query Event query (gatherpress_event posts).
+ * @param array    $opts  Optional: `classes` (string) extra CSS classes,
+ *                        `excerpt_words` (int) words to keep in excerpt,
+ *                        `is_past` (bool) treat as past events for muted
+ *                        visual styling.
  */
-function render_event_cards( \WP_Query $query, array $opts = array() ): void {
+function render_event_cards( WP_Query $query, array $opts = array() ): void {
 	if ( ! $query->have_posts() ) {
 		return;
 	}
@@ -154,7 +157,7 @@ function render_event_cards( \WP_Query $query, array $opts = array() ): void {
 	<div class="<?php echo esc_attr( $wrap_classes ); ?>">
 	<?php
 	foreach ( $query->posts as $post_id ) :
-		$event     = new \GatherPress\Core\Event( $post_id );
+		$event     = new Event( $post_id );
 		$permalink = get_permalink( $post_id );
 		$thumb     = get_the_post_thumbnail_url( $post_id, 'large' );
 		$title     = get_the_title( $post_id );

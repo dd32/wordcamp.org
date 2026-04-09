@@ -10,20 +10,21 @@
  * button opens the same React modal used for creation, in `edit` mode and
  * pre-loaded with the current event's data.
  *
- * @package Groups_Site
+ * @package WordCamp\Groups\Site
  */
+
+namespace WordCamp\Groups\Site\Patterns\EditEventLink;
+
+use function WordCamp\Groups\Frontend\Capabilities\current_user_can_manage_events;
 
 defined( 'ABSPATH' ) || exit;
 
-if (
-	! function_exists( 'WPorg_Groups_Frontend\\Capabilities\\current_user_can_manage_events' )
-	|| ! \WPorg_Groups_Frontend\Capabilities\current_user_can_manage_events()
-) {
+if ( ! current_user_can_manage_events() ) {
 	return;
 }
 
-$groups_site_post = get_post();
-if ( ! $groups_site_post || 'gatherpress_event' !== $groups_site_post->post_type ) {
+$post = get_post();
+if ( ! $post || 'gatherpress_event' !== $post->post_type ) {
 	return;
 }
 ?>
@@ -32,7 +33,7 @@ if ( ! $groups_site_post || 'gatherpress_event' !== $groups_site_post->post_type
 	type="button"
 	class="groups-site-edit-event-link"
 	data-wporg-groups-modal="edit"
-	data-wporg-groups-event-id="<?php echo (int) $groups_site_post->ID; ?>"
+	data-wporg-groups-event-id="<?php echo (int) $post->ID; ?>"
 	style="background:none;border:none;padding:0;color:var(--wp--preset--color--blueberry-1);font:inherit;font-size:14px;cursor:pointer;text-decoration:underline;"
 >&#9998; Edit this event</button>
 <!-- /wp:html -->

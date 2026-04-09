@@ -5,10 +5,10 @@
  * Author:      WordPress.org Meta Team
  * License:     GPL-2.0-or-later
  *
- * @package WPorg_Groups_Frontend
+ * @package WordCamp\Groups\Frontend
  */
 
-namespace WPorg_Groups_Frontend;
+namespace WordCamp\Groups\Frontend;
 
 defined( 'WPINC' ) || die();
 
