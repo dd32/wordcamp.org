@@ -18,6 +18,10 @@ function add_event_data(): void {
 		return;
 	}
 
+	if ( empty( $GLOBALS['WCCSP_Settings'] ) ) {
+		return;
+	}
+
 	$coming_soon_settings = $GLOBALS['WCCSP_Settings']->get_settings();
 
 	if ( 'off' !== $coming_soon_settings['enabled'] ) {
@@ -49,6 +53,10 @@ function add_event_data(): void {
  */
 function build_event_payload( WP_Post $wordcamp ) {
 	global $camptix;
+
+	if ( empty( $camptix ) ) {
+		return false;
+	}
 
 	$cache_key      = 'structured-data-event';
 	$cached_payload = get_transient( $cache_key );
@@ -87,10 +95,6 @@ function build_event_payload( WP_Post $wordcamp ) {
 	$status = get_event_status( $wordcamp );
 
 	if ( ! $status ) {
-		return false;
-	}
-
-	if ( empty( $camptix ) ) {
 		return false;
 	}
 
@@ -268,6 +272,10 @@ function get_event_location( WP_Post $wordcamp ): object {
  */
 function get_event_offers( array $active_tickets ) {
 	global $camptix;
+
+	if ( empty( $camptix ) ) {
+		return false;
+	}
 
 	$tickets_page_id = $camptix->get_tickets_post_id();
 
