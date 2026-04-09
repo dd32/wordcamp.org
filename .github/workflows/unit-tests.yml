@@ -97,7 +97,7 @@ jobs:
       env:
         DB_PORT: ${{ job.services.mariadb.ports['3306'] }}
       run: |
-        bash .docker/bin/install-wp-tests.sh wcorg_test root root "127.0.0.1:${DB_PORT}" latest
+        bash .docker/bin/install-wp-tests.sh wcorg_test root root "127.0.0.1:${DB_PORT}" latest true
 
     - name: Running unit tests
       run: ./public_html/wp-content/mu-plugins/vendor/bin/phpunit -c phpunit.xml.dist
