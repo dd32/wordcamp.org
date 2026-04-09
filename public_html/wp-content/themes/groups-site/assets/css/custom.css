@@ -41,20 +41,6 @@
 	height: auto;
 }
 
-/* ==========================================================================
-   Front-page hero header (site-title + nav merged into hero background)
-   ========================================================================== */
-
-.groups-site-hero-header .wp-block-site-title a,
-.groups-site-hero-header .wp-block-navigation a {
-	color: var(--wp--preset--color--charcoal-1);
-	text-decoration: none;
-	transition: color 0.15s ease;
-}
-
-.groups-site-hero-header .wp-block-navigation a:hover {
-	color: var(--wp--preset--color--blueberry-1);
-}
 
 /* ==========================================================================
    Front-page hero
