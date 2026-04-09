@@ -64,7 +64,7 @@
 }
 
 .groups-site-hero .wp-block-button.is-style-outline .wp-element-button:hover {
-	color: var(--wp--preset--color--white);
+	color: var(--wp--preset--color--white) !important;
 	border-color: var(--wp--preset--color--deep-blueberry);
 }
 
