@@ -42,24 +42,15 @@
 }
 
 /* ==========================================================================
-   Local header — sticky bar with site title + page nav
+   Local navigation (below the hero on the front page)
    ========================================================================== */
 
-.groups-site-local-header {
-	position: sticky;
-	top: 0;
-	z-index: 100;
-	backdrop-filter: blur(12px);
-	-webkit-backdrop-filter: blur(12px);
-	background-color: rgba(255, 255, 255, 0.95) !important;
-}
-
-.groups-site-local-header .wp-block-navigation a {
+.groups-site-local-nav .wp-block-navigation a {
 	text-decoration: none;
 	transition: color 0.15s ease;
 }
 
-.groups-site-local-header .wp-block-navigation .current-menu-item > a {
+.groups-site-local-nav .wp-block-navigation .current-menu-item > a {
 	color: var(--wp--preset--color--blueberry-1);
 }
 
