@@ -90,6 +90,10 @@ function build_event_payload( WP_Post $wordcamp ) {
 		return false;
 	}
 
+	if ( empty( $camptix ) ) {
+		return false;
+	}
+
 	$active_tickets = $camptix->get_active_tickets();
 
 	if ( ! $active_tickets ) {
