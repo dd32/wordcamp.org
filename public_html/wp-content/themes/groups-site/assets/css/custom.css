@@ -56,7 +56,7 @@
 			var(--wp--preset--color--blueberry-4) 45%,
 			transparent 70%
 		),
-		url('https://wordpress.org/files/2025/12/education-main-section.png');
+		url('https://events.wordpress.org/wp-content/themes/wporg-events-2023/images/community-team.png');
 	background-position: right center;
 	background-size: cover;
 	background-repeat: no-repeat;
@@ -111,30 +111,8 @@
 
 .groups-site-event-cards {
 	display: grid;
-	grid-template-columns: 1fr;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 	gap: 28px;
-}
-
-@media (min-width: 600px) {
-	.groups-site-event-cards {
-		grid-template-columns: repeat(2, 1fr);
-	}
-}
-
-@media (min-width: 960px) {
-	.groups-site-event-cards--compact {
-		grid-template-columns: repeat(3, 1fr);
-	}
-}
-
-.groups-site-event-cards--expanded {
-	gap: 40px;
-}
-
-@media (min-width: 720px) {
-	.groups-site-event-cards--expanded {
-		grid-template-columns: repeat(2, 1fr);
-	}
 }
 
 .groups-site-event-cards--past .groups-site-event-card {
