@@ -72,13 +72,11 @@ function enqueue_assets(): void {
 		true
 	);
 
-	// Block editor + components stylesheets — required for the inline
-	// Gutenberg editor instance to render correctly on the front end.
+	// Block editor component stylesheets — only the scoped ones needed for
+	// the modal's inline editor. Avoid wp-edit-blocks and
+	// wp-reset-editor-styles as they set body-level font/background
+	// overrides that break the front-end page appearance.
 	wp_enqueue_style( 'wp-components' );
-	wp_enqueue_style( 'wp-block-editor' );
-	wp_enqueue_style( 'wp-edit-blocks' );
-	wp_enqueue_style( 'wp-block-library' );
-	wp_enqueue_style( 'wp-format-library' );
 
 	wp_enqueue_style(
 		STYLE_HANDLE,
