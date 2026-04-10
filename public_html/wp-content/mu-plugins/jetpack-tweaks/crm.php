@@ -13,22 +13,28 @@ defined( 'WPINC' ) || die();
  * @see ZeroBSCRM.AdminStyling.php:264
  * @see https://github.com/Automattic/jetpack/pull/47143
  */
-add_action( 'admin_head', function () {
-	if ( ! defined( 'ZBS_PLUGIN_DIR' ) ) {
-		return;
-	}
+add_action(
+	'admin_head',
+	function () {
+		if ( ! defined( 'ZBS_PLUGIN_DIR' ) ) {
+			return;
+		}
 
-	global $_wp_admin_css_colors;
+		global $_wp_admin_css_colors;
 
-	$current_color = get_user_option( 'admin_color' );
+		$current_color = get_user_option( 'admin_color' );
 
-	if ( ! isset( $_wp_admin_css_colors[ $current_color ] ) ) {
-		return;
-	}
+		if ( ! isset( $_wp_admin_css_colors[ $current_color ] ) ) {
+			return;
+		}
 
-	$colors = &$_wp_admin_css_colors[ $current_color ]->colors;
+		$colors     = &$_wp_admin_css_colors[ $current_color ]->colors;
+		$color_count = count( $colors );
 
-	while ( count( $colors ) < 4 ) {
-		$colors[] = end( $colors );
-	}
-}, 9 );
+		while ( $color_count < 4 ) {
+			$colors[] = end( $colors );
+			$color_count++;
+		}
+	},
+	9
+);
