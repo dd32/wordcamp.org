@@ -186,7 +186,7 @@ function register_routes(): void {
  * are checked-but-not-required so the JS can autosave a half-filled form.
  */
 function draft_args_schema(): array {
-	$schema = event_args_schema();
+	$schema                           = event_args_schema();
 	$schema['title']['required']      = false;
 	$schema['date']['required']       = false;
 	$schema['time_start']['required'] = false;
@@ -277,7 +277,7 @@ function get_event_form_data( WP_REST_Request $request ): WP_REST_Response {
 	$is_editing = $event_id > 0 && Event::POST_TYPE === get_post_type( $event_id );
 
 	if ( $is_editing ) {
-		$fields['title']       = (string) get_post_field( 'post_title', $event_id );
+		$fields['title'] = (string) get_post_field( 'post_title', $event_id );
 		// Hand the editor only the description-prose blocks so it doesn't
 		// trip on the GatherPress metadata blocks (event-date, venue, RSVP,
 		// etc.) it has no way to render. The save path puts the metadata
@@ -311,7 +311,7 @@ function get_event_form_data( WP_REST_Request $request ): WP_REST_Response {
 
 	// Always include the keys so the JS code can read them without
 	// `undefined` checks.
-	$fields['featured_image_id']  = $fields['featured_image_id']  ?? 0;
+	$fields['featured_image_id']  = $fields['featured_image_id'] ?? 0;
 	$fields['featured_image_url'] = $fields['featured_image_url'] ?? '';
 
 	$venues = array_map(
@@ -323,12 +323,12 @@ function get_event_form_data( WP_REST_Request $request ): WP_REST_Response {
 		},
 		get_posts(
 			array(
-				'post_type'      => Venue::POST_TYPE,
-				'post_status'    => 'publish',
-				'numberposts'    => 200,
-				'orderby'        => 'title',
-				'order'          => 'ASC',
-				'no_found_rows'  => true,
+				'post_type'     => Venue::POST_TYPE,
+				'post_status'   => 'publish',
+				'numberposts'   => 200,
+				'orderby'       => 'title',
+				'order'         => 'ASC',
+				'no_found_rows' => true,
 			)
 		)
 	);
@@ -353,22 +353,22 @@ function get_event_form_data( WP_REST_Request $request ): WP_REST_Response {
 function list_drafts(): WP_REST_Response {
 	$drafts = get_posts(
 		array(
-			'post_type'      => Event::POST_TYPE,
-			'post_status'    => 'draft',
-			'numberposts'    => 50,
-			'orderby'        => 'modified',
-			'order'          => 'DESC',
-			'no_found_rows'  => true,
+			'post_type'     => Event::POST_TYPE,
+			'post_status'   => 'draft',
+			'numberposts'   => 50,
+			'orderby'       => 'modified',
+			'order'         => 'DESC',
+			'no_found_rows' => true,
 		)
 	);
 
 	$out = array_map(
 		static function ( $post ) {
 			return array(
-				'id'            => (int) $post->ID,
-				'title'         => $post->post_title ? html_entity_decode( $post->post_title ) : '',
-				'modified_gmt'  => $post->post_modified_gmt,
-				'event_date'    => (string) get_post_meta( $post->ID, 'gatherpress_datetime_start', true ),
+				'id'           => (int) $post->ID,
+				'title'        => $post->post_title ? html_entity_decode( $post->post_title ) : '',
+				'modified_gmt' => $post->post_modified_gmt,
+				'event_date'   => (string) get_post_meta( $post->ID, 'gatherpress_datetime_start', true ),
 			);
 		},
 		$drafts
@@ -446,9 +446,9 @@ function save_draft( WP_REST_Request $request ): WP_REST_Response {
 
 	return new WP_REST_Response(
 		array(
-			'id'            => $saved_id,
-			'title'         => get_the_title( $saved_id ),
-			'saved_at_gmt'  => current_time( 'mysql', true ),
+			'id'           => $saved_id,
+			'title'        => get_the_title( $saved_id ),
+			'saved_at_gmt' => current_time( 'mysql', true ),
 		)
 	);
 }

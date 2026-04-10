@@ -55,9 +55,9 @@ add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\enqueue_assets' );
 function register_pattern_category() {
 	register_block_pattern_category(
 		'groups-site',
-		[
+		array(
 			'label' => __( 'Groups Site', 'groups-site' ),
-		]
+		)
 	);
 }
 add_action( 'init', __NAMESPACE__ . '\register_pattern_category' );
@@ -87,18 +87,20 @@ function filter_nav_page_list( $pages ) {
 
 	$front_id = (int) get_option( 'page_on_front' );
 
-	return array_values( array_filter(
-		$pages,
-		static function ( $page ) use ( $front_id ) {
-			if ( $front_id && (int) $page->ID === $front_id ) {
-				return false;
+	return array_values(
+		array_filter(
+			$pages,
+			static function ( $page ) use ( $front_id ) {
+				if ( $front_id && (int) $page->ID === $front_id ) {
+					return false;
+				}
+				if ( 'feedback' === $page->post_name || 'Leave Feedback' === $page->post_title ) {
+					return false;
+				}
+				return true;
 			}
-			if ( 'feedback' === $page->post_name || 'Leave Feedback' === $page->post_title ) {
-				return false;
-			}
-			return true;
-		}
-	) );
+		)
+	);
 }
 add_filter( 'get_pages', __NAMESPACE__ . '\filter_nav_page_list' );
 
@@ -150,12 +152,12 @@ function strip_event_metadata_blocks( $content ) {
 	// render when their inner blocks are present in `post_content`. They're
 	// part of the default GatherPress event template, and need to live in the
 	// main column where users interact with them.
-	$strip = [
+	$strip = array(
 		'gatherpress/event-date',
 		'gatherpress/venue',
 		'gatherpress/add-to-calendar',
 		'gatherpress/online-event',
-	];
+	);
 
 	$blocks = parse_blocks( $content );
 	$kept   = array_filter(
@@ -182,15 +184,15 @@ function event_comment_form_defaults( $defaults ) {
 		return $defaults;
 	}
 
-	$defaults['title_reply']         = '';
-	$defaults['title_reply_to']      = '';
-	$defaults['title_reply_before']  = '';
-	$defaults['title_reply_after']   = '';
+	$defaults['title_reply']          = '';
+	$defaults['title_reply_to']       = '';
+	$defaults['title_reply_before']   = '';
+	$defaults['title_reply_after']    = '';
 	$defaults['comment_notes_before'] = '';
 	$defaults['comment_notes_after']  = '';
-	$defaults['logged_in_as']        = '';
-	$defaults['label_submit']        = __( 'Post reply', 'groups-site' );
-	$defaults['class_submit']        = 'submit wp-element-button';
+	$defaults['logged_in_as']         = '';
+	$defaults['label_submit']         = __( 'Post reply', 'groups-site' );
+	$defaults['class_submit']         = 'submit wp-element-button';
 
 	$defaults['comment_field'] = sprintf(
 		'<p class="comment-form-comment"><label class="screen-reader-text" for="comment">%1$s</label><textarea id="comment" name="comment" cols="45" rows="3" maxlength="65525" required placeholder="%2$s"></textarea></p>',
