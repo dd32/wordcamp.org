@@ -82,6 +82,14 @@
    Single event layout
    ========================================================================== */
 
+/* ----------  Date header row  ---------- */
+
+.groups-site-event-date-header .wp-block-gatherpress-add-to-calendar .wp-block-gatherpress-dropdown__trigger {
+	font-size: var(--wp--preset--font-size--small);
+}
+
+/* ----------  Event info card  ---------- */
+
 .groups-site-event-info-card {
 	box-shadow: 0 1px 2px rgba(30, 30, 30, 0.04),
 		0 2px 8px rgba(30, 30, 30, 0.04);
@@ -100,6 +108,30 @@
 	font-weight: 600;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
+}
+
+/* "Join Us" heading uses the serif font at a larger size. */
+.groups-site-event-info-card > .wp-block-heading.has-heading-5-font-size {
+	font-family: var(--wp--preset--font-family--eb-garamond);
+	font-size: var(--wp--preset--font-size--heading-5);
+	letter-spacing: normal;
+	text-transform: none;
+	color: var(--wp--preset--color--charcoal-0);
+}
+
+/* Avatar stack — overlap avatars to form a compact row. */
+.groups-site-event-info-card .is-style-avatar-stack [data-id] {
+	margin-left: -10px;
+}
+
+.groups-site-event-info-card .is-style-avatar-stack [data-id]:first-child {
+	margin-left: 0;
+}
+
+.groups-site-event-info-card .wp-block-avatar img {
+	border-radius: 9999px !important;
+	border: 2px solid var(--wp--preset--color--white);
+	box-shadow: 0 1px 2px rgba(30, 30, 30, 0.08);
 }
 
 /* ==========================================================================
