@@ -34,5 +34,6 @@ iframe {
 	.groups-site-event-sidebar .groups-site-event-info-card {
 		position: sticky;
 		top: 96px;
+		z-index: 100;
 	}
 }

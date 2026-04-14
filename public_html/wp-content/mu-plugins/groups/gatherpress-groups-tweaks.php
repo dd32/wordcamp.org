@@ -53,6 +53,16 @@ add_filter(
 );
 
 /**
+ * Require login to post comments (Discussion section) on group sites.
+ */
+add_filter(
+	'pre_option_comment_registration',
+	static function () {
+		return '1';
+	}
+);
+
+/**
  * Make the gatherpress_venue post type non-public so it has no front-end
  * archive or singular URLs. Venues are only used as metadata on events.
  */

@@ -82,6 +82,26 @@
    Single event layout
    ========================================================================== */
 
+/* ----------  RSVP modal overrides  ---------- */
+
+.wp-block-gatherpress-modal {
+	z-index: 100 !important;
+}
+
+.groups-site-event-info-card .wp-block-gatherpress-modal-content {
+	background: var(--wp--preset--color--white);
+	color: var(--wp--preset--color--charcoal-1);
+	border-radius: 8px;
+	padding: 32px;
+	max-width: 400px;
+	text-align: center;
+	box-shadow: 0 8px 32px rgba(30, 30, 30, 0.2);
+}
+
+.groups-site-event-info-card .wp-block-gatherpress-modal-content .wp-block-buttons {
+	justify-content: center;
+}
+
 /* ----------  Date header row  ---------- */
 
 .groups-site-event-date-header .wp-block-gatherpress-add-to-calendar .wp-block-gatherpress-dropdown__trigger {
