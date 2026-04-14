@@ -20,5 +20,5 @@ defined( 'ABSPATH' ) || exit;
 $events_url = esc_url( home_url( '/event/' ) );
 ?>
 <!-- wp:paragraph {"fontSize":"small"} -->
-<p class="has-small-font-size"><a href="<?php echo $events_url; ?>">View all events &rarr;</a></p>
+<p class="has-small-font-size"><a href="<?php echo esc_url( $events_url ); ?>">View all events &rarr;</a></p>
 <!-- /wp:paragraph -->

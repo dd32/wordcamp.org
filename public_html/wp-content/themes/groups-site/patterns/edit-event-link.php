@@ -23,8 +23,8 @@ if ( ! current_user_can_manage_events() ) {
 	return;
 }
 
-$post = get_post();
-if ( ! $post || 'gatherpress_event' !== $post->post_type ) {
+$current_post = get_post();
+if ( ! $current_post || 'gatherpress_event' !== $current_post->post_type ) {
 	return;
 }
 ?>
@@ -33,7 +33,7 @@ if ( ! $post || 'gatherpress_event' !== $post->post_type ) {
 	type="button"
 	class="groups-site-edit-event-link"
 	data-wporg-groups-modal="edit"
-	data-wporg-groups-event-id="<?php echo (int) $post->ID; ?>"
+	data-wporg-groups-event-id="<?php echo (int) $current_post->ID; ?>"
 	style="background:none;border:none;padding:0;color:var(--wp--preset--color--blueberry-1);font:inherit;font-size:14px;cursor:pointer;text-decoration:underline;"
 >&#9998; Edit this event</button>
 <!-- /wp:html -->

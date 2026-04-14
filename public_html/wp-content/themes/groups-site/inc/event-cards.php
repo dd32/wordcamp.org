@@ -174,7 +174,7 @@ function render_event_cards( WP_Query $query, array $opts = array() ): void {
 			<?php endif; ?>
 
 			<div class="groups-site-event-card__body">
-				<p class="groups-site-event-card__date"><?php echo $datetime; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped — built from controlled date format strings only. ?></p>
+				<p class="groups-site-event-card__date"><?php echo esc_html( $datetime ); ?></p>
 				<h3 class="groups-site-event-card__title"><?php echo esc_html( $title ); ?></h3>
 				<?php if ( $excerpt ) : ?>
 					<p class="groups-site-event-card__excerpt"><?php echo esc_html( $excerpt ); ?></p>

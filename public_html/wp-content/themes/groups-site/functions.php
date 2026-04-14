@@ -124,6 +124,12 @@ function single_template_hierarchy( $templates ) {
 }
 add_filter( 'single_template_hierarchy', __NAMESPACE__ . '\single_template_hierarchy' );
 
+/**
+ * Prepend 'archive-event' to the template hierarchy for event archives.
+ *
+ * @param array $templates Template hierarchy.
+ * @return array Modified template hierarchy.
+ */
 function archive_template_hierarchy( $templates ) {
 	if ( is_post_type_archive( 'gatherpress_event' ) ) {
 		array_unshift( $templates, 'archive-event' );

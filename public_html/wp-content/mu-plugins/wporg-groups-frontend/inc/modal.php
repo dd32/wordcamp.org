@@ -26,6 +26,9 @@ use function WordCamp\Groups\Frontend\Capabilities\current_user_can_manage_event
 const SCRIPT_HANDLE = 'wporg-groups-event-modal';
 const STYLE_HANDLE  = 'wporg-groups-event-modal';
 
+/**
+ * Bootstrap the event modal assets and mount point.
+ */
 function bootstrap(): void {
 	add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\enqueue_assets' );
 	add_action( 'wp_footer', __NAMESPACE__ . '\render_mount_point' );
