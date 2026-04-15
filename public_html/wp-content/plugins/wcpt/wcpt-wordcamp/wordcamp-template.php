@@ -444,7 +444,14 @@ function wcpt_get_wordcamp_venue_name( $wordcamp_id = 0 ) {
 		$wordcamp_id = wcpt_get_wordcamp_id();
 	}
 
-	return apply_filters( 'wcpt_get_wordcamp_venue_name', get_post_meta( $wordcamp_id, 'Venue Name', true ) );
+	$venue_name = get_post_meta( $wordcamp_id, 'Venue Name', true );
+
+	// Multi-venue support: join array values with comma for display.
+	if ( is_array( $venue_name ) ) {
+		$venue_name = implode( ', ', array_filter( $venue_name ) );
+	}
+
+	return apply_filters( 'wcpt_get_wordcamp_venue_name', $venue_name );
 }
 
 /**
@@ -637,10 +644,16 @@ function wcpt_feed_event_info( $content ) {
 		</p>
 	<?php endif; ?>
 
-	<?php if ( isset( $custom_fields['Venue Name'][0] ) && $custom_fields['Venue Name'][0] ) : ?>
+	<?php
+	$venue_display = isset( $custom_fields['Venue Name'][0] ) ? $custom_fields['Venue Name'][0] : '';
+	if ( is_serialized( $venue_display ) ) {
+		$venue_display = implode( ', ', array_filter( maybe_unserialize( $venue_display ) ) );
+	}
+	?>
+	<?php if ( $venue_display ) : ?>
 		<p>
 			Venue:
-			<?php echo esc_html( $custom_fields['Venue Name'][0] ); ?>
+			<?php echo esc_html( $venue_display ); ?>
 		</p>
 	<?php endif; ?>
 	
