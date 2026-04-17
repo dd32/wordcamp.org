@@ -6033,7 +6033,7 @@ class CampTix_Plugin {
 		while ( $attendees = get_posts( array(
 			'fields' => 'ids',
 			'post_type' => 'tix_attendee',
-			'post_status' => 'draft',
+			'post_status' => array( 'draft', 'pending' ),
 			'posts_per_page' => 100,
 			'cache_results' => false,
 			'meta_query' => array(
@@ -6055,8 +6055,8 @@ class CampTix_Plugin {
 			foreach ( $attendees as $attendee_id ) {
 				do_action( 'camptix_pre_attendee_timeout', $attendee_id );
 
-				// Check the post_status again, incase a filter has caused the post to change.
-				if ( 'draft' !== get_post_field( 'post_status', $attendee_id ) ) {
+				// Check the post_status again, in case a hook has caused the post to change.
+				if ( ! in_array( get_post_field( 'post_status', $attendee_id ), array( 'draft', 'pending' ), true ) ) {
 					continue;
 				}
 
