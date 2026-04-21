@@ -491,11 +491,12 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 					}
 
 					/*
-					 * The "Actual Attendees" field is only able to be set after the event is concluded.
+					 * The "Actual Attendees" field is shown once the event is scheduled or closed,
+					 * and is required before closing the event.
 					 *
 					 * get_post() allows this to target the editor, allowing for report export.
 					 */
-					if ( get_post() && get_post_status() !== 'wcpt-closed' ) {
+					if ( get_post() && ! in_array( get_post_status(), array( 'wcpt-scheduled', 'wcpt-closed' ), true ) ) {
 						unset( $retval['Actual Attendees'] );
 					}
 
@@ -537,11 +538,12 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 					}
 
 					/*
-					 * The "Actual Attendees" field is only able to be set after the event is concluded.
+					 * The "Actual Attendees" field is shown once the event is scheduled or closed,
+					 * and is required before closing the event.
 					 *
 					 * get_post() allows this to target the editor, allowing for report export.
 					 */
-					if ( get_post() && get_post_status() !== 'wcpt-closed' ) {
+					if ( get_post() && ! in_array( get_post_status(), array( 'wcpt-scheduled', 'wcpt-closed' ), true ) ) {
 						unset( $retval['Actual Attendees'] );
 					}
 
@@ -1114,6 +1116,18 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 				}
 			}
 
+			// Closed - require Actual Attendees (only for admin form submissions, not cron auto-close).
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce check would have done in `metabox_save`.
+			if ( 'wcpt-closed' === $post_data['post_status'] && isset( $post_data_raw['ID'] ) && ! empty( $_POST['action'] ) && 'editpost' === $_POST['action'] ) {
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce check would have done in `metabox_save`.
+				$actual_attendees = $_POST[ wcpt_key_to_str( 'Actual Attendees', 'wcpt_' ) ] ?? '';
+
+				if ( empty( $actual_attendees ) && '0' !== $actual_attendees ) {
+					$post_data['post_status']     = 'wcpt-scheduled';
+					$this->active_admin_notices[] = 5;
+				}
+			}
+
 			return $post_data;
 		}
 
@@ -1292,6 +1306,11 @@ if ( ! class_exists( 'WordCamp_Admin' ) ) :
 						__( 'The %s could not be geocoded, which prevents the camp from showing up in the Events Widget. Please tweak the address so that Google Maps can parse it.', 'wordcamporg' ),
 						self::get_address_key( $post->ID )
 					),
+				),
+
+				5 => array(
+					'type'   => 'error',
+					'notice' => __( 'This WordCamp cannot be closed until the Actual Attendees field is filled in.', 'wordcamporg' ),
 				),
 			);
 
