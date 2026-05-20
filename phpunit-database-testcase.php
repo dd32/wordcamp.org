@@ -24,6 +24,8 @@ class Database_TestCase extends WP_UnitTestCase {
 	protected static $yearless_site_id;
 	protected static $slash_year_with_yearless_site_id;
 	protected static $events_rome_training_site_id;
+	protected static $year_dot_2020_cancelled_site_id;
+	protected static $slash_year_2021_cancelled_site_id;
 
 	/**
 	 * Create sites we'll need for the tests.
@@ -120,9 +122,41 @@ class Database_TestCase extends WP_UnitTestCase {
 			'network_id' => EVENTS_NETWORK_ID,
 		) );
 
+		// Cancelled sites: these are the "newest" but should be skipped due to cancelled status.
+		self::$year_dot_2020_cancelled_site_id = $factory->blog->create( array(
+			'domain'     => '2020.seattle.wordcamp.test',
+			'path'       => '/',
+			'network_id' => WORDCAMP_NETWORK_ID,
+		) );
+
+		self::$slash_year_2021_cancelled_site_id = $factory->blog->create( array(
+			'domain'     => 'vancouver.wordcamp.test',
+			'path'       => '/2021/',
+			'network_id' => WORDCAMP_NETWORK_ID,
+		) );
+
 		// Simulate renamed sites by adding old_home_url blogmeta.
 		add_site_meta( self::$slash_year_2020_site_id, 'old_home_url', 'https://vancouver.wordcamp.test/2019/' );
 		add_site_meta( self::$events_rome_training_site_id, 'old_home_url', 'https://events.wordpress.test/rome/2023/training/' );
+
+		// Create WordCamp posts on the central/root blog with 'wcpt-cancelled' status for the cancelled sites.
+		switch_to_blog( WORDCAMP_ROOT_BLOG_ID );
+
+		$cancelled_seattle_post_id = wp_insert_post( array(
+			'post_type'   => 'wordcamp',
+			'post_status' => 'wcpt-cancelled',
+			'post_title'  => 'WordCamp Seattle 2020 (Cancelled)',
+		) );
+		update_post_meta( $cancelled_seattle_post_id, '_site_id', self::$year_dot_2020_cancelled_site_id );
+
+		$cancelled_vancouver_post_id = wp_insert_post( array(
+			'post_type'   => 'wordcamp',
+			'post_status' => 'wcpt-cancelled',
+			'post_title'  => 'WordCamp Vancouver 2021 (Cancelled)',
+		) );
+		update_post_meta( $cancelled_vancouver_post_id, '_site_id', self::$slash_year_2021_cancelled_site_id );
+
+		restore_current_blog();
 	}
 
 	/**
@@ -140,6 +174,8 @@ class Database_TestCase extends WP_UnitTestCase {
 		wp_delete_site( self::$slash_year_2018_dev_site_id );
 		wp_delete_site( self::$slash_year_2020_site_id );
 		wp_delete_site( self::$events_rome_training_site_id );
+		wp_delete_site( self::$year_dot_2020_cancelled_site_id );
+		wp_delete_site( self::$slash_year_2021_cancelled_site_id );
 
 		foreach ( [ WORDCAMP_NETWORK_ID, EVENTS_NETWORK_ID ] as $network_id ) {
 			$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->sitemeta} WHERE site_id = %d", $network_id ) );
