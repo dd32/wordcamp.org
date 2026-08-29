@@ -31,6 +31,7 @@ if ( ! class_exists( 'Meetup_Admin' ) ) :
 			add_action( 'wcpt_metabox_value', array( $this, 'render_co_organizers_list' ) );
 			add_action( 'wcpt_metabox_save_done', array( $this, 'meetup_organizers_changed' ), 10, 2 );
 			add_action( 'transition_post_status', array( $this, 'maybe_update_organizers' ), 10, 3 );
+			add_action( 'pre_get_posts', array( $this, 'handle_sortable_columns' ) );
 		}
 
 		/**
@@ -116,15 +117,56 @@ if ( ! class_exists( 'Meetup_Admin' ) ) :
 		public function column_headers( $columns ) {
 			$columns = array(
 				'cb'                   => '<input type="checkbox" />',
-				'title'                => __( 'Title',          'wordcamporg' ),
-				'taxonomy-meetup_tags' => __( 'Meetup Tags',    'wordcamporg' ),
-				'organizer'            => __( 'Organizer',      'wordcamporg' ),
-				'date'                 => __( 'Date',           'wordcamporg' ),
-				'meetup.com_url'       => __( 'Meetup URL',     'wordcamporg' ),
-				'helpscout_url'        => __( 'HelpScout Link', 'wordcamporg' ),
+				'title'                => __( 'Title',            'wordcamporg' ),
+				'taxonomy-meetup_tags' => __( 'Meetup Tags',      'wordcamporg' ),
+				'organizer'            => __( 'Organizer',        'wordcamporg' ),
+				'last_meetup'          => __( 'Last Meetup',      'wordcamporg' ),
+				'number_of_events'     => __( 'Number of Events', 'wordcamporg' ),
+				'date'                 => __( 'Date',             'wordcamporg' ),
+				'meetup.com_url'       => __( 'Meetup URL',       'wordcamporg' ),
+				'helpscout_url'        => __( 'HelpScout Link',   'wordcamporg' ),
 			);
 
 			return $columns;
+		}
+
+		/**
+		 * Make custom columns sortable.
+		 *
+		 * @param array $columns List of sortable columns.
+		 *
+		 * @return array
+		 */
+		public function sortable_columns( $columns ) {
+			$columns['last_meetup']      = 'last_meetup';
+			$columns['number_of_events'] = 'number_of_events';
+
+			return $columns;
+		}
+
+		/**
+		 * Handle sorting by custom columns.
+		 *
+		 * @param WP_Query $query The current query.
+		 */
+		public function handle_sortable_columns( $query ) {
+			if ( ! is_admin() || ! $query->is_main_query() ) {
+				return;
+			}
+
+			if ( $this->get_event_type() !== $query->get( 'post_type' ) ) {
+				return;
+			}
+
+			$orderby = $query->get( 'orderby' );
+
+			if ( 'last_meetup' === $orderby ) {
+				$query->set( 'meta_key', 'Last meetup on' );
+				$query->set( 'orderby', 'meta_value_num' );
+			} elseif ( 'number_of_events' === $orderby ) {
+				$query->set( 'meta_key', 'Number of past meetups' );
+				$query->set( 'orderby', 'meta_value_num' );
+			}
 		}
 
 		/**
@@ -169,6 +211,18 @@ if ( ! class_exists( 'Meetup_Admin' ) ) :
 			switch ( $column ) {
 				case 'organizer':
 					echo esc_html( get_post_meta( $post_id, 'Organizer Name', true ) );
+					break;
+				case 'last_meetup':
+					$last_meetup = get_post_meta( $post_id, 'Last meetup on', true );
+					if ( $last_meetup ) {
+						echo esc_html( gmdate( 'Y-m-d', substr( $last_meetup, 0, 10 ) ) );
+					} else {
+						echo '—';
+					}
+					break;
+				case 'number_of_events':
+					$count = get_post_meta( $post_id, 'Number of past meetups', true );
+					echo esc_html( $count ?: '0' );
 					break;
 				case 'meetup.com_url':
 					$this->print_clickable_link( get_post_meta( $post_id, 'Meetup URL', true ) );
