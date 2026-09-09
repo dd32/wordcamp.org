@@ -87,7 +87,7 @@ abstract class CampTix_Payment_Method extends CampTix_Addon {
 		global $camptix;
 
 		// Whitelist the methods we want to use to avoid unintentionally calling CampTix_Plugin methods in case of typos, etc
-		$camptix_methods = array( 'payment_result', 'redirect_with_error_flags', 'error_flag', 'get_tickets_url', 'log', 'field_text', 'field_checkbox', 'field_yesno' );
+		$camptix_methods = array( 'payment_result', 'redirect_with_error_flags', 'error_flag', 'get_tickets_url', 'log', 'field_text', 'field_checkbox', 'field_yesno', 'update_attendees_for_payment_token' );
 
 		if ( in_array( $name, $camptix_methods ) ) {
 			// Set a default value for the log $module parameter
@@ -228,7 +228,17 @@ abstract class CampTix_Payment_Method extends CampTix_Addon {
 		global $camptix;
 
 		$refund_data = array();
-		$camptix->log( __FUNCTION__ . ' not implemented in payment module.', 0, null, 'refund' );
+
+		_doing_it_wrong(
+			esc_html( get_class( $this ) ) . '::payment_refund',
+			sprintf(
+				'Payment gateway "%s" has not implemented refund support. Payment gateways should implement the payment_refund() method.',
+				esc_html( $this->name )
+			),
+			'CampTix 1.7'
+		);
+
+		$camptix->log( __FUNCTION__ . ' not implemented in payment module ' . get_class( $this ) . '.', 0, null, 'refund' );
 
 		return $this->payment_result( $payment_token, CampTix_Plugin::PAYMENT_STATUS_REFUND_FAILED, $refund_data );
 	}
@@ -251,7 +261,16 @@ abstract class CampTix_Payment_Method extends CampTix_Addon {
 			'refund_transaction_details' => array(),
 		);
 
-		$camptix->log( __FUNCTION__ . ' not implemented in payment module.', 0, null, 'refund' );
+		_doing_it_wrong(
+			esc_html( get_class( $this ) ) . '::send_refund_request',
+			sprintf(
+				'Payment gateway "%s" has not implemented refund support. Payment gateways should implement the send_refund_request() method.',
+				esc_html( $this->name )
+			),
+			'CampTix 1.7'
+		);
+
+		$camptix->log( __FUNCTION__ . ' not implemented in payment module ' . get_class( $this ) . '.', 0, null, 'refund' );
 		return $result;
 	}
 
